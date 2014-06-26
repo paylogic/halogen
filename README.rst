@@ -13,23 +13,68 @@ halogen
 
 Python HAL generation/parsing library.
 
-Schemas can be defined to specify attributes to be exposed and a structure
+Halogen takes the advantage of the declarative style serialization with easily extendable schemas.
+Schema combines the knowledge about your data model, attribute mapping and advanced accessing, with
+complex types and data transformation.
 
-Serialization
--------------
+Library is purposed in representing your data in HAL format in the most obvious way possible, but also 
+of the generic web form-like functionality so that your schemas and types can be reused as much as possible.
 
 Schema
 ~~~~~~
 
-Schema.serialize
-****************
+Schema is the main building block of the serialization. It is also a type which means you can declare nested
+structures with schemas.
 
-Dict
-^^^^
 
-You can pass dictionary like a param for ``serialize`` method of schema.
+Serialization
+-------------
 
-Example:
+.. code-block:: python
+    
+    >>> Hello.serialize({"hello": "Hello World"})
+    >>> "hello": "Hello World"
+
+Simply call Schema.serialize() class method which can accept dict or any other object.
+
+Validation
+^^^^^^^^^^
+
+There's no validation involved in the serialization. Your source data or your model is considered
+to be clean since it is coming from the storage and it is not a user input. Of course exceptions
+in the types or attribute accessors may occur but they are considered as programming errors.
+
+
+Serializing dict
+^^^^^^^^^^^^^^^^
+
+Dictionary values are automatically accessed by the schema attributes using their names as keys:
+
+.. code-block:: python
+
+    import halogen
+    
+    class Hello(halogen.Schema):
+        hello = halogen.Attr()
+
+
+    serialized = Hello.serialize({"hello": "Hello World"})
+
+
+Result:
+
+.. code-block:: json
+
+    {
+        "hello": "Hello World"
+    }
+
+HAL is just JSON, but according to it's specification it SHOULD have self link to identify the
+serialized resource. For this you should use HAL-specific attributes and configure the way the
+``self`` is composed.
+
+
+HAL example:
 
 .. code-block:: python
 
@@ -61,12 +106,10 @@ Result:
     }
 
 
-Object
-^^^^^^
+Serializing objects
+^^^^^^^^^^^^^^^^^^^
 
-Also you can pass object like a param to ``serialize`` method of schema.
-
-Example:
+Similar to dictionary keys the schema attributes can also access object properties:
 
 .. code-block:: python
 
@@ -100,13 +143,14 @@ Result:
 Attribute
 *********
 
-Part of schema's creation.
+Attributes form the schema and incapsulate the knowledge how to get the data from your model,
+how to transform it according to the specific type.
 
 Attr()
 ^^^^^^
 
-If you wont passed any names of dict's or object's attributes then halogen will get key/attribute from
-object with name of attribute.
+The name of the attribute member in the schema is the name of the key the result will be serialized to.
+By default the same attribute name is used to access the source model.
 
 Example:
 
@@ -143,7 +187,9 @@ Result:
 Attr("const")
 ^^^^^^^^^^^^^
 
-If you will pass string as first param of attribute then halogen will do bypass of this tring.
+In case the attribute represents a constant the value can be specified as a first parameter. This first parameter
+is a type of the attribute. If the type is not a instance or subclass of a :class:`halogen.types.Type` it will
+be bypassed.
 
 .. code-block:: python
 
@@ -174,14 +220,12 @@ Result:
         'name': 'custom name'
     }
 
+In some cases also the ``attr`` can be specified to be a callable that returns a constant value.
 
 Attr(attr="foo")
 ^^^^^^^^^^^^^^^^
 
-You can change name of schema attribute which will be go to serialized result of schema
-just passing name of object attribute or key of dict into ``attr`` param of Attr class.
-
-See ``name`` attribute of ``SpellSchema``.
+In case the attribute name doesn't correspond your model you can override it:
 
 .. code-block:: python
 
@@ -212,10 +256,24 @@ Result:
         'name': 'Abra Cadabra'
     }
 
-Attr(attr=lambda )
-^^^^^^^^^^^^^^^^^^
+The ``attr`` parameter accepts strings of the source attribute name or even dot-separated path to the attribute.
+This works for both: nested dictionaries or related objects an Python properties.
 
-You can use ``lambda`` as value of ``attr`` of Attr class.
+
+.. code-block:: python
+
+    import halogen
+
+    class SpellSchema(halogen.Schema):
+        name = halogen.Attr(attr="path.to.my.attribute")
+
+
+Attr(attr=lambda value: value)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``attr`` parameter accepts callables that take the entire source model and can access the neccessary
+attribute. You can pass a function or lambda in order to return the desired value which
+also can be just a constant.
 
 .. code-block:: python
 
@@ -249,12 +307,17 @@ Result:
 Attr(attr=Acccessor)
 ^^^^^^^^^^^^^^^^^^^^
 
-Get example from Oleg.
+In case the schema is used for both directions to serialize and to deserialize the :class:`halogen.schema.Accessor`
+can be passed with both ``getter`` and ``setter`` specified.
+``Getter`` is a string or callable in order to get the value from a model, and ``setter`` is a string or callable
+that knows where the deserialized value should be stored.
 
 Attr(Type())
 ^^^^^^^^^^^^
 
-You can pass type as first param of attribute. See ``genres`` attribute.
+After the attibute gets the value it passes it to it's type in order to complete the serialization.
+Halogen provides basic types for example :class:`halogen.types.List` to implement lists of values or schemas.
+Schema is also a Type and can be passed to the attribute to implement complex structures.
 
 Example:
 
@@ -304,12 +367,20 @@ Result:
 Type
 ****
 
+Type is responsible in serialization of individual values such as integers, strings, dates. Also type
+is a base of Schema. It has both serialize() and deserialize() methods that convert the attribute's value.
+Unlike Schema types are instantiated. You can configure serialization behavior by passing parameters to
+their constructors while declaring your schema.
+
+Types can raise :class:`halogen.exceptions.ValidationError` during deserialization, but serialization
+expects the value that this type knows how to transform.
+
 Type.serialize
 ^^^^^^^^^^^^^^
 
-When you are calling ``serialize`` from schema you are launching proccess in which schema is started to collect
-its attributes then attributes detecting which types they are handling and then attributes launch ``serialize``
-from their types.
+The default implementation of the Type.serialize is a bypass.
+
+Serialization method of a type is the last opportunity to convert the value that is being serialized:
 
 Example:
 
@@ -362,9 +433,29 @@ Result:
         }
     }
 
-Type.inheritance
-^^^^^^^^^^^^^^^^
-    example
+Subclassing types
+^^^^^^^^^^^^^^^^^
+
+Types that are common in your application can be shared between schemas. This could be the datetime type,
+specific URL type, internationalized strings and any other representation that requires specific format.
+
+Example:
+
+.. code-block:: python
+
+    import flask
+    import halogen
+
+    class Amount(halogen.types.Type):
+
+        def __init__(self, digits):
+            self.digits = digits
+
+        def serialize(self, value):
+            return {
+                "currency": value.currency,
+                "amount": value.amount.quantize(self.digits),
+            }
 
 Type.deserialize
 ^^^^^^^^^^^^^^^^
@@ -420,7 +511,7 @@ what ``halogen.Link`` should put into ``href``.
 CURIE
 ~~~~~
 
-"CURIE"s help providing links to resource documentation.
+CURIEs are providing links to the resource documentation.
 
 .. code-block:: python
 
