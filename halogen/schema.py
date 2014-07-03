@@ -86,7 +86,7 @@ class Attr(object):
 
     """Schema attribute."""
 
-    def __init__(self, attr_type=None, attr=None, required=True):
+    def __init__(self, attr_type=None, attr=None, required=True, **kwargs):
         """Attribute constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -96,6 +96,9 @@ class Attr(object):
         self.attr_type = attr_type or types.Type
         self.attr = attr
         self.required = required
+
+        if "default" in kwargs:
+            self.default = kwargs["default"]
 
     @property
     def compartment(self):
@@ -134,7 +137,15 @@ class Attr(object):
         :return: Serialized attribute value.
         """
         if types.Type.is_type(self.attr_type):
-            return self.attr_type.serialize(self.accessor.get(value))
+            try:
+                value = self.accessor.get(value)
+            except (AttributeError, KeyError):
+                if not hasattr(self, "default"):
+                    raise
+                value = self.default
+
+            return self.attr_type.serialize(value)
+
         return self.attr_type
 
     def deserialize(self, value):
@@ -150,10 +161,20 @@ class Attr(object):
         :raises: ValidationError.
         """
         compartment = value
+
         if self.compartment is not None:
             compartment = value[self.compartment]
+
         if self.name in compartment:
-            return self.attr_type.deserialize(compartment[self.key])
+            try:
+                value = compartment[self.key]
+            except KeyError:
+                if not hasattr(self, "default"):
+                    raise
+                value = self.default
+
+            return self.attr_type.deserialize(value)
+
         elif self.required:
             raise exceptions.ValidationError("Missing attribute.", self.key)
 
@@ -169,17 +190,19 @@ class Link(Attr):
 
     """Link attribute of a schema."""
 
-    def __init__(self, attr_type=None, attr=None, required=True, curie=None, templated=None, type=None):
+    def __init__(self, attr_type=None, attr=None, key=None, required=True, curie=None, templated=None, type=None):
         """Link constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
+        :param key: Key of the link in the _links compartment, defaults to name.
         :param required: Is this link required to be present.
         :param curie: Link namespace prefix (e.g. "<prefix>:<name>") or Curie object.
         :param templated: Is this link templated.
         :param type: Its value is a string used as a hint to indicate the media type expected when dereferencing
                            the target resource.
         """
+
         if not types.Type.is_type(attr_type):
 
             if attr_type is not None:
@@ -203,6 +226,7 @@ class Link(Attr):
 
         super(Link, self).__init__(attr_type=attr_type, attr=attr, required=required)
         self.curie = curie
+        self._key = key
 
     @property
     def compartment(self):
@@ -216,7 +240,7 @@ class Link(Attr):
         :note: Links support curies.
         """
         if self.curie is None:
-            return self.name
+            return self._key or self.name
         return ":".join((self.curie.name, self.name))
 
     def deserialize(self, value):
