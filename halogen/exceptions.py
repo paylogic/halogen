@@ -4,6 +4,7 @@ import json
 
 
 class ValidationError(Exception):
+
     """It will be raised when validation will be failed."""
 
     def __init__(self, errors, attr=None):

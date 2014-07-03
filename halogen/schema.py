@@ -18,58 +18,60 @@ BYPASS = lambda value: value
 
 class Accessor(object):
 
-    """Object that incapsulates the getter and the setter of the attribute."""
+    """Object that encapsulates the getter and the setter of the attribute."""
 
     def __init__(self, getter=None, setter=None):
+        """Initialize an Accessor object."""
         self.getter = getter
         self.setter = setter
 
-    def get(self, value):
-        """Get an attribute from a value.
+    def get(self, obj):
+        """Get an attribute from an object.
 
-        :param value: Object to get the attribute value from.
+        :param obj: Object to get the attribute value from.
         :return: Value of object's attribute.
         """
         assert self.getter is not None, "Getter accessor is not specified."
         if callable(self.getter):
-            return self.getter(value)
+            return self.getter(obj)
 
         assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
 
         for attr in self.getter.split("."):
-            if isinstance(value, dict):
-                value = value[attr]
+            if isinstance(obj, dict):
+                obj = obj[attr]
             else:
-                value = getattr(value, attr)
+                obj = getattr(obj, attr)
 
-        if callable(value):
-            return value()
+        if callable(obj):
+            return obj()
 
-        return value
+        return obj
 
-    def set(self, result, value):
-        """Set value for result's attribute.
+    def set(self, obj, value):
+        """Set value for obj's attribute.
 
-        :param result: Result object or dict to assign the attribute to.
+        :param obj: Result object or dict to assign the attribute to.
         :param value: Value to be assigned.
         """
         assert self.setter is not None, "Setter accessor is not specified."
         if callable(self.setter):
-            return self.setter(value)
+            return self.setter(obj, value)
 
         assert isinstance(self.setter, string_types), "Accessor must be a function or a dot-separated string."
 
-        def setdefault(result, attr, value):
-            if isinstance(result, dict):
-                result.setdefault(attr, value)
+        def _set(obj, attr, value):
+            if isinstance(obj, dict):
+                obj[attr] = value
             else:
-                setattr(result, attr, value)
+                setattr(obj, attr, value)
             return value
 
         path = self.setter.split(".")
         for attr in path[:-1]:
-            result = setdefault(result, attr, {})
-        setdefault(result, path[-1], value)
+            obj = _set(obj, attr, {})
+
+        _set(obj, path[-1], value)
 
     def __repr__(self):
         """Accessor representation."""
@@ -111,11 +113,13 @@ class Attr(object):
 
         :return: `Accessor` instance.
         """
+        if isinstance(self.attr, Accessor):
+            return self.attr
+
+        if callable(self.attr):
+            return Accessor(getter=self.attr)
+
         attr = self.attr or self.name
-
-        if isinstance(attr, Accessor):
-            return attr
-
         return Accessor(getter=attr, setter=attr)
 
     def serialize(self, value):
@@ -202,18 +206,21 @@ class Link(Attr):
 
     @property
     def compartment(self):
-        """Links are placed in the _links."""
+        """Return the compartment in which Links are placed (_links)."""
         return "_links"
 
     @property
     def key(self):
-        """Links support curies."""
+        """The key of the this attribute will be placed into (within it's compartment).
+
+        :note: Links support curies.
+        """
         if self.curie is None:
             return self.name
         return ":".join((self.curie.name, self.name))
 
     def deserialize(self, value):
-        """Links don't support deserialization."""
+        """Link doesn't support deserialization."""
         raise NotImplementedError
 
 
@@ -260,6 +267,12 @@ class Embedded(Attr):
     """Embedded attribute of schema."""
 
     def __init__(self, attr_type=None, attr=None, curie=None):
+        """Embedded constructor.
+
+        :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
+        :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
+        :param curie: The curie used for this embedded attribute.
+        """
         super(Embedded, self).__init__(attr_type, attr)
         self.curie = curie
 
@@ -274,9 +287,6 @@ class Embedded(Attr):
         if self.curie is None:
             return self.name
         return ":".join((self.curie.name, self.name))
-
-    def serialize(self, value):
-        return super(Embedded, self).serialize(value)
 
 
 class _Schema(types.Type):

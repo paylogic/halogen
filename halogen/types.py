@@ -2,6 +2,7 @@
 
 
 class Type(object):
+
     """Base class for creating types."""
 
     @classmethod
@@ -14,12 +15,12 @@ class Type(object):
         """Desirialization of value."""
         return value
 
-    @classmethod
-    def is_type(cls, value):
-        """Is value instance or subclass of this class."""
+    @staticmethod
+    def is_type(value):
+        """Is value an instance or subclass of the class Type."""
         if isinstance(value, type):
-            return issubclass(value, cls)
-        return isinstance(value, cls)
+            return issubclass(value, Type)
+        return isinstance(value, Type)
 
 
 class List(Type):

@@ -32,8 +32,8 @@ Serialization
 
 .. code-block:: python
 
-    >>> Hello.serialize({"hello": "Hello World"})
-    >>> "hello": "Hello World"
+    >>> Schema.serialize({"hello": "Hello World"})
+    >>> {"hello": "Hello World"}
 
 Simply call Schema.serialize() class method which can accept dict or any other object.
 
@@ -143,7 +143,7 @@ Result:
 Attribute
 ---------
 
-Attributes form the schema and incapsulate the knowledge how to get the data from your model,
+Attributes form the schema and encapsulate the knowledge how to get the data from your model,
 how to transform it according to the specific type.
 
 Attr()
@@ -289,7 +289,7 @@ also can be just a constant.
 
     class SpellSchema(halogen.Schema):
         self = halogen.Link(attr=lambda spell: url_for("spell.get" uid=spell.uid))
-        name = halogen.Attr(attr="title")
+        name = halogen.Attr(attr=lambda value: value.title)
 
     serialized = SpellSchema.serialize(spell)
 
