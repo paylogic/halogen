@@ -5,7 +5,7 @@ from halogen.schema import Attr, Accessor
 from halogen.types import Type
 
 
-def test_serialize_type():
+def test_serialize_type(mock_get_context):
     """Test if serialization of a "type" works.
 
     Test if serialization of an Attr with an attr_type that is a "type" correctly calls the serialization function.
@@ -24,7 +24,6 @@ def test_serialize_type():
         # is actually used.
         attr_type = mock.Mock(spec=Type)
         attr = Attr(attr_type=attr_type)
-
         attr.serialize(data)
 
     # Was the accessor used?

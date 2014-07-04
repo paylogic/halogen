@@ -1,6 +1,7 @@
 """Halogen schema primitives."""
 
 import sys
+import inspect
 
 from . import types
 from . import exceptions
@@ -16,6 +17,19 @@ else:
 BYPASS = lambda value: value
 
 
+def _get_context(func, kwargs):
+    """Prepare a context for the serialization.
+
+    :param func: Function which needs or does not need kwargs.
+    :param kwargs: Dict with context
+    :return: Keywords arguments that function can accept.
+    """
+    argspec = inspect.getargspec(func)
+    if argspec.keywords is not None:
+        return kwargs
+    return dict((arg, kwargs[arg]) for arg in argspec.args if arg in kwargs)
+
+
 class Accessor(object):
 
     """Object that encapsulates the getter and the setter of the attribute."""
@@ -25,15 +39,15 @@ class Accessor(object):
         self.getter = getter
         self.setter = setter
 
-    def get(self, obj):
-        """Get an attribute from an object.
+    def get(self, obj, **kwargs):
+        """Get an attribute from a value.
 
         :param obj: Object to get the attribute value from.
         :return: Value of object's attribute.
         """
         assert self.getter is not None, "Getter accessor is not specified."
         if callable(self.getter):
-            return self.getter(obj)
+            return self.getter(obj, **_get_context(self.getter, kwargs))
 
         assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
 
@@ -125,7 +139,7 @@ class Attr(object):
         attr = self.attr or self.name
         return Accessor(getter=attr, setter=attr)
 
-    def serialize(self, value):
+    def serialize(self, value, **kwargs):
         """Serialize the attribute of the input data.
 
         Gets the attribute value with accessor and converts it using the
@@ -138,13 +152,13 @@ class Attr(object):
         """
         if types.Type.is_type(self.attr_type):
             try:
-                value = self.accessor.get(value)
+                value = self.accessor.get(value, **kwargs)
             except (AttributeError, KeyError):
-                if not hasattr(self, "default"):
+                if not hasattr(self, "default") and self.required:
                     raise
                 value = self.default
 
-            return self.attr_type.serialize(value)
+            return self.attr_type.serialize(value, **_get_context(self.attr_type.serialize, kwargs))
 
         return self.attr_type
 
@@ -153,7 +167,7 @@ class Attr(object):
 
         Get the value from the HAL structure from the attribute's compartment
         using the attribute's name as a key, convert it using the attribute's
-        type. Schema will either return it to the parent schema or will assign
+        type. Schema will either return it to  parent schema or will assign
         to the output value if specified using the attribute's accessor setter.
 
         :param value: HAL structure to get the value from.
@@ -330,14 +344,14 @@ class _Schema(types.Type):
         return schema
 
     @classmethod
-    def serialize(cls, value):
+    def serialize(cls, value, **kwargs):
         result = {}
         for attr in cls.__attrs__:
             compartment = result
             if attr.compartment is not None:
                 compartment = result.setdefault(attr.compartment, {})
             try:
-                compartment[attr.key] = attr.serialize(value)
+                compartment[attr.key] = attr.serialize(value, **kwargs)
             except (AttributeError, KeyError):
                 if attr.required:
                     raise

@@ -32,7 +32,7 @@ def test_get_object_callable(basic_object_value, basic_object):
     assert acc.get(basic_object) == basic_object_value
 
 
-def test_get_object_callable_called(basic_object):
+def test_get_object_callable_called(mock_get_context, basic_object):
     """Test if Accessor.get() calls Accessor.getter() if getter is callable."""
     acc = Accessor()
     acc.getter = mock.Mock()

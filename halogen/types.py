@@ -30,6 +30,6 @@ class List(Type):
         super(List, self).__init__()
         self.item_type = item_type or Type
 
-    def serialize(self, value):
+    def serialize(self, value, **kwargs):
         """Overrided serialize for returning list of value's items."""
-        return [self.item_type.serialize(val) for val in value]
+        return [self.item_type.serialize(val, **kwargs) for val in value]
