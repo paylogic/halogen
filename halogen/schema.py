@@ -149,7 +149,10 @@ class Attr(object):
         if self.compartment is not None:
             compartment = value[self.compartment]
         if self.name in compartment:
-            return self.attr_type.deserialize(compartment[self.key])
+            try:
+                return self.attr_type.deserialize(compartment[self.key])
+            except ValueError as e:
+                raise exceptions.ValidationError(e.message, self.key)
         elif self.required:
             raise exceptions.ValidationError("Missing attribute.", self.key)
 
