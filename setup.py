@@ -17,7 +17,7 @@ class ToxTestCommand(TestCommand):
 
     def run_tests(self):
         """Invoke the test runner (tox)."""
-        #import here, cause outside the eggs aren't loaded
+        # import here, cause outside the eggs aren't loaded
         import detox.main
         errno = detox.main.main(self.test_args)
         sys.exit(errno)

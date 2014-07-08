@@ -17,11 +17,11 @@ Halogen takes the advantage of the declarative style serialization with easily e
 Schema combines the knowledge about your data model, attribute mapping and advanced accessing, with
 complex types and data transformation.
 
-Library is purposed in representing your data in HAL format in the most obvious way possible, but also 
+Library is purposed in representing your data in HAL format in the most obvious way possible, but also
 of the generic web form-like functionality so that your schemas and types can be reused as much as possible.
 
 Schema
-~~~~~~
+======
 
 Schema is the main building block of the serialization. It is also a type which means you can declare nested
 structures with schemas.
@@ -31,14 +31,14 @@ Serialization
 -------------
 
 .. code-block:: python
-    
-    >>> Hello.serialize({"hello": "Hello World"})
-    >>> "hello": "Hello World"
+
+    >>> Schema.serialize({"hello": "Hello World"})
+    >>> {"hello": "Hello World"}
 
 Simply call Schema.serialize() class method which can accept dict or any other object.
 
 Validation
-^^^^^^^^^^
+----------
 
 There's no validation involved in the serialization. Your source data or your model is considered
 to be clean since it is coming from the storage and it is not a user input. Of course exceptions
@@ -46,14 +46,14 @@ in the types or attribute accessors may occur but they are considered as program
 
 
 Serializing dict
-^^^^^^^^^^^^^^^^
+----------------
 
 Dictionary values are automatically accessed by the schema attributes using their names as keys:
 
 .. code-block:: python
 
     import halogen
-    
+
     class Hello(halogen.Schema):
         hello = halogen.Attr()
 
@@ -99,15 +99,15 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': '/spells/abracadabra'}
+        "_links": {
+            "self": {"href": "/spells/abracadabra"}
         },
-        'name': 'Abra Cadabra'
+        "name": "Abra Cadabra"
     }
 
 
 Serializing objects
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 Similar to dictionary keys the schema attributes can also access object properties:
 
@@ -134,20 +134,20 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': '/spells/abracadabra'}
+        "_links": {
+            "self": {"href": "/spells/abracadabra"}
         },
-        'name': 'Abra Cadabra'
+        "name": "Abra Cadabra"
     }
 
 Attribute
-*********
+---------
 
-Attributes form the schema and incapsulate the knowledge how to get the data from your model,
+Attributes form the schema and encapsulate the knowledge how to get the data from your model,
 how to transform it according to the specific type.
 
 Attr()
-^^^^^^
+~~~~~~
 
 The name of the attribute member in the schema is the name of the key the result will be serialized to.
 By default the same attribute name is used to access the source model.
@@ -177,18 +177,18 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': '/spells/abracadabra'}
+        "_links": {
+            "self": {"href": "/spells/abracadabra"}
         },
-        'name': 'Abra Cadabra'
+        "name": "Abra Cadabra"
     }
 
 
 Attr("const")
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 In case the attribute represents a constant the value can be specified as a first parameter. This first parameter
-is a type of the attribute. If the type is not a instance or subclass of a :class:`halogen.types.Type` it will
+is a type of the attribute. If the type is not a instance or subclass of a ``halogen.types.Type`` it will
 be bypassed.
 
 .. code-block:: python
@@ -214,16 +214,16 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': '/spells/abracadabra'}
+        "_links": {
+            "self": {"href": "/spells/abracadabra"}
         },
-        'name': 'custom name'
+        "name": "custom name"
     }
 
 In some cases also the ``attr`` can be specified to be a callable that returns a constant value.
 
 Attr(attr="foo")
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 In case the attribute name doesn't correspond your model you can override it:
 
@@ -250,10 +250,10 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': '/spells/abracadabra'}
+        "_links": {
+            "self": {"href": "/spells/abracadabra"}
         },
-        'name': 'Abra Cadabra'
+        "name": "Abra Cadabra"
     }
 
 The ``attr`` parameter accepts strings of the source attribute name or even dot-separated path to the attribute.
@@ -269,7 +269,7 @@ This works for both: nested dictionaries or related objects an Python properties
 
 
 Attr(attr=lambda value: value)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``attr`` parameter accepts callables that take the entire source model and can access the neccessary
 attribute. You can pass a function or lambda in order to return the desired value which
@@ -289,7 +289,7 @@ also can be just a constant.
 
     class SpellSchema(halogen.Schema):
         self = halogen.Link(attr=lambda spell: url_for("spell.get" uid=spell.uid))
-        name = halogen.Attr(attr="title")
+        name = halogen.Attr(attr=lambda value: value.title)
 
     serialized = SpellSchema.serialize(spell)
 
@@ -298,25 +298,27 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': '/spells/abracadabra'}
+        "_links": {
+            "self": {"href": "/spells/abracadabra"}
         },
-        'name': 'Abra Cadabra'
+        "name": "Abra Cadabra"
     }
 
 Attr(attr=Acccessor)
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
-In case the schema is used for both directions to serialize and to deserialize the :class:`halogen.schema.Accessor`
+In case the schema is used for both directions to serialize and to deserialize the ``halogen.schema.Accessor``
 can be passed with both ``getter`` and ``setter`` specified.
 ``Getter`` is a string or callable in order to get the value from a model, and ``setter`` is a string or callable
 that knows where the deserialized value should be stored.
 
+
+
 Attr(Type())
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 After the attibute gets the value it passes it to it's type in order to complete the serialization.
-Halogen provides basic types for example :class:`halogen.types.List` to implement lists of values or schemas.
+Halogen provides basic types for example ``halogen.types.List`` to implement lists of values or schemas.
 Schema is also a Type and can be passed to the attribute to implement complex structures.
 
 Example:
@@ -353,30 +355,36 @@ Result:
 .. code-block:: json
 
     {
-        '_links': {
-            'self': {'href': 'good-book-uid'}
+        "_links": {
+            "self": {"href": "good-book-uid"}
         },
-        'genres': [
-            {'_links': {'self': {'href': 'fantasy-literature'}}, 'title': 'fantasy literature'},
-            {'_links': {'self': {'href': 'mystery'}}, 'title': 'mystery'},
-            {'_links': {'self': {'href': 'adventure'}}, 'title': 'adventure'}
+        "genres": [
+            {"_links": {"self": {"href": "fantasy-literature"}}, "title": "fantasy literature"},
+            {"_links": {"self": {"href": "mystery"}}, "title": "mystery"},
+            {"_links": {"self": {"href": "adventure"}}, "title": "adventure"}
         ],
-        'title': "Harry Potter and the Philosopher's Stone"
+        "title": "Harry Potter and the Philosopher's Stone"
     }
 
 Type
-****
+----
 
 Type is responsible in serialization of individual values such as integers, strings, dates. Also type
 is a base of Schema. It has both serialize() and deserialize() methods that convert the attribute's value.
 Unlike Schema types are instantiated. You can configure serialization behavior by passing parameters to
 their constructors while declaring your schema.
 
-Types can raise :class:`halogen.exceptions.ValidationError` during deserialization, but serialization
+Types can raise ``halogen.exceptions.ValidationError`` during deserialization, but serialization
 expects the value that this type knows how to transform.
 
+Subclassing types
+~~~~~~~~~~~~~~~~~
+
+Types that are common in your application can be shared between schemas. This could be the datetime type,
+specific URL type, internationalized strings and any other representation that requires specific format.
+
 Type.serialize
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 The default implementation of the Type.serialize is a bypass.
 
@@ -396,7 +404,7 @@ Example:
     class AmountType(halogen.types.Type):
         def serialize(self, value):
 
-            if value is None:
+            if value is None or not isinstance(value, Amount):
                 return None
 
             return {
@@ -426,61 +434,35 @@ Result:
 .. code-block:: json
 
     {
-        'name': 'Milk',
-        'price': {
-            'amount': 1,
-            'currency': 'EUR'
+        "name": "Milk",
+        "price": {
+            "amount": 1,
+            "currency": "EUR"
         }
     }
 
-Subclassing types
-^^^^^^^^^^^^^^^^^
-
-Types that are common in your application can be shared between schemas. This could be the datetime type,
-specific URL type, internationalized strings and any other representation that requires specific format.
-
-Example:
-
-.. code-block:: python
-
-    import flask
-    import halogen
-
-    class Amount(halogen.types.Type):
-
-        def __init__(self, digits):
-            self.digits = digits
-
-        def serialize(self, value):
-            return {
-                "currency": value.currency,
-                "amount": value.amount.quantize(self.digits),
-            }
-
-Type.deserialize
-^^^^^^^^^^^^^^^^
-    example
 
 HAL
----
+===
 
 Hypertext Application Language.
 
 RFC
-~~~
+---
 
 The JSON variant of HAL (application/hal+json) has now been published as an internet draft: draft-kelly-json-hal_
 
 .. _draft-kelly-json-hal: http://tools.ietf.org/html/draft-kelly-json-hal.
 
 Link
-~~~~
+----
+
 Link objects at RFC: link-objects_
 
 .. _link-objects: http://tools.ietf.org/html/draft-kelly-json-hal-06#section-5
 
 href
-^^^^
+----
 
 The "href" property is REQUIRED.
 
@@ -564,12 +546,13 @@ Schema also can be a param to link
 .. code-block:: json
 
     {
-        '_links': {
-            'books': {
-                'href': '/books'
+        "_links": {
+            "books": {
+                "href": "/books"
             }
         }
     }
+
 
 Embedded
 ~~~~~~~~
@@ -591,7 +574,7 @@ Example:
     em = halogen.Curie(
         name="em",
         href="https://docs.event-manager.com/{rel}.html",
-        templated=True,
+        templated=true,
         type="text/html"
     )
 
@@ -637,67 +620,164 @@ Result:
 .. code-block:: json
 
     {
-        '_embedded': {
-            'em:events': [
+        "_embedded": {
+            "em:events": [
                 {
-                    '_links': {
-                        'curies': [
+                    "_links": {
+                        "curies": [
                             {
-                                'href': 'https://docs.event-manager.com/{rel}.html',
-                                'name': 'em',
-                                'templated': True,
-                                'type': 'text/html'
+                                "href": "https://docs.event-manager.com/{rel}.html",
+                                "name": "em",
+                                "templated": true,
+                                "type": "text/html"
                             }
                         ],
-                        'em:collection': {'href': '/events/activity-event'},
-                        'self': {'href': '/events/activity-event'}
+                        "em:collection": {"href": "/events/activity-event"},
+                        "self": {"href": "/events/activity-event"}
                     },
-                    'uid': 'activity-event'
+                    "uid": "activity-event"
                 }
             ],
-            'em:publications': [
+            "em:publications": [
                 {
-                    '_links': {
-                        'curies': [
+                    "_links": {
+                        "curies": [
                             {
-                                'href': 'https://docs.event-manager.com/{rel}.html',
-                                'name': 'em',
-                                'templated': True,
-                                'type': 'text/html'
+                                "href": "https://docs.event-manager.com/{rel}.html",
+                                "name": "em",
+                                "templated": true,
+                                "type": "text/html"
                             }
                         ],
-                        'em:campaign': {'href': '/campaign/activity-event'},
-                        'em:event': {'href': '/events/activity-event'},
-                        'self': {'href': '/campaigns/activity-campaign/events/activity-event'}
+                        "em:campaign": {"href": "/campaign/activity-event"},
+                        "em:event": {"href": "/events/activity-event"},
+                        "self": {"href": "/campaigns/activity-campaign/events/activity-event"}
                     }
                 }
             ]
         },
-        '_links': {
-            'curies': [
+        "_links": {
+            "curies": [
                 {
-                    'href': 'https://docs.event-manager.com/{rel}.html',
-                    'name': 'em',
-                    'templated': True,
-                    'type': 'text/html'
+                    "href": "https://docs.event-manager.com/{rel}.html",
+                    "name": "em",
+                    "templated": true,
+                    "type": "text/html"
                 }
             ],
-            'self': {'href': '/events'}
+            "self": {"href": "/events"}
         }
     }
 
 Deserialization
----------------
-description
+===============
 
-Variant1
-~~~~~~~~
-return dict
-example
+Schema has ``deserialize`` method. Method ``deserialize`` will return dict as a result of deserialization
+if you wont pass any object as a second param.
 
-Variant2
-~~~~~~~~
-assign on object which was passed as a param
+Example:
 
-create of related objects
-example
+.. code-block:: python
+
+    import halogen
+
+    class Hello(halogen.Schema):
+        hello = halogen.Attr()
+
+    result = Hello.deserialize({"hello": "Hello World"})
+    print result
+
+Result:
+
+.. code-block:: python
+
+    {
+        "hello": "Hello World"
+    }
+
+However, if you will pass object as the second param of ``deserialize`` method then data will be assigned on object's
+attributes.
+
+Example:
+
+.. code-block:: python
+
+    import halogen
+
+    class HellMessage(object):
+        hello = ""
+
+
+    hello_message = HellMessage()
+
+
+    class Hello(halogen.Schema):
+        hello = halogen.Attr()
+
+
+    Hello.deserialize({"hello": "Hello World"}, hello_message)
+    print hello_message.hello
+
+Result:
+
+.. code-block:: python
+
+    "Hello World"
+
+Type.deserialize
+----------------
+
+How you already know attributes launch ``serialize`` method from types which they are supported in moment of
+serialization but in case of deserialization the same attributes will launch ``deserialize`` method. It means that
+when you write your types you should not forget about ``deserialize`` methods for them.
+
+Example:
+
+.. code-block:: python
+
+    import halogen
+    import decimal
+
+
+    class Amount(object):
+        currency = "EUR"
+        amount = 1
+
+        def __init__(self, currency, amount):
+            self.currency = currency
+            self.amount = amount
+
+        def __repr__(self):
+            return "Amount: {currency} {amount}".format(currency=self.currency, amount=str(self.amount))
+
+
+    class AmountType(halogen.types.Type):
+
+        def serialize(self, value):
+
+            if value is None or not isinstance(value, Amount):
+                return None
+
+            return {
+                "currency": value.currency,
+                "amount": value.amount
+            }
+
+        def deserialize(self, value):
+            return Amount(value["currency"], decimal.Decimal(str(value["amount"])))
+
+
+    class ProductSchema(halogen.Schema):
+        title = halogen.Attr()
+        price = halogen.Attr(AmountType())
+
+
+    product = ProductSchema.deserialize({"title": "Pencil", "price": {"currency": "EUR", "amount": 0.30}})
+    print product
+
+
+Resource:
+
+.. code-block:: python
+
+    {"price": Amount: EUR 0.3, "title": "Pencil"}
