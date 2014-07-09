@@ -1,4 +1,4 @@
-"""Basic objects and functions for testing."""
+"""Simple objects and dicts, that can be used as input for unit-testing functions."""
 from collections import namedtuple
 
 import pytest

@@ -12,7 +12,7 @@ class Type(object):
 
     @classmethod
     def deserialize(cls, value):
-        """Desirialization of value."""
+        """Deserialization of value."""
         return value
 
     @staticmethod
@@ -24,9 +24,11 @@ class Type(object):
 
 
 class List(Type):
+
     """List type for Halogen schema attribute."""
 
     def __init__(self, item_type=None):
+        """Create a new List."""
         super(List, self).__init__()
         self.item_type = item_type or Type
 

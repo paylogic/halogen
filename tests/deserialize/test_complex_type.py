@@ -1,3 +1,5 @@
+"""Test functionality of Halogen when using a complex type."""
+
 import copy
 from decimal import Decimal, InvalidOperation
 
@@ -9,8 +11,12 @@ from halogen import exceptions
 
 
 class Amount(halogen.types.Type):
+
+    """A combination of currency and amount."""
+
     @classmethod
     def deserialize(cls, value):
+        """Serialize an amount."""
         try:
             return dict(
                 currency=value["currency"],
@@ -21,11 +27,17 @@ class Amount(halogen.types.Type):
 
 
 class Person(halogen.Schema):
+
+    """A person has a name and surname."""
+
     name = halogen.Attr()
     surname = halogen.Attr()
 
 
 class NestedSchema(halogen.Schema):
+
+    """An example nested schema, with a person, an is_friend attribute, and a price."""
+
     person = halogen.Attr(Person)
     is_friend = halogen.Attr()
     price = halogen.Attr(Amount)
@@ -33,7 +45,6 @@ class NestedSchema(halogen.Schema):
 
 def test_nested():
     """Test deserialization of a nested type."""
-
     nested_data = {
         "person": {
             "name": "Johann",
@@ -76,6 +87,7 @@ def test_invalid_value():
 
 
 def test_missing_attribute():
+    """Test if an exception is raised when an attribute is missing."""
     data = {
         "is_friend": True,
         "price": {"currency": "EUR", "amount": "wrong_amount"}

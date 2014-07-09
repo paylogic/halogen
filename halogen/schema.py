@@ -213,7 +213,6 @@ class Link(Attr):
         :param type: Its value is a string used as a hint to indicate the media type expected when dereferencing
                            the target resource.
         """
-
         if not types.Type.is_type(attr_type):
 
             if attr_type is not None:
@@ -392,7 +391,11 @@ class _Schema(types.Type):
 
 
 class _SchemaType(type):
+
+    """A type used to create Schemas."""
+
     def __init__(cls, name, bases, clsattrs):
+        """Create a new _SchemaType."""
         cls.__class_attrs__ = []
         curies = set([])
 
@@ -433,3 +436,4 @@ class _SchemaType(type):
 
 
 Schema = _SchemaType("Schema", (_Schema, ), {"__doc__": _Schema.__doc__})
+"""Schema is the basic class used for setting up schemas."""

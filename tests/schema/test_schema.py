@@ -1,3 +1,4 @@
+"""Test the serialize function of Schema."""
 import mock
 
 import halogen
@@ -7,6 +8,9 @@ import halogen
 def test_schema_calls_attr(attr_serialize):
     """Test that schema serialize calls attr serialize with the correct value."""
     class S(halogen.Schema):
+
+        """Test schema."""
+
         key = halogen.Attr()
 
     S.serialize({'key': 1})

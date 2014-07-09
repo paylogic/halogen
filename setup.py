@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""Setup functionality for the Halogen library."""
+import codecs
 import sys
 from os.path import abspath, dirname, join
 
@@ -7,6 +9,7 @@ from setuptools.command.test import test as TestCommand
 
 
 class ToxTestCommand(TestCommand):
+
     """Test command which runs tox under the hood."""
 
     def finalize_options(self):
@@ -25,17 +28,17 @@ class ToxTestCommand(TestCommand):
 long_description = []
 
 for text_file in ['README.rst', 'CHANGES.rst']:
-    with open(join(dirname(abspath(__file__)), text_file), 'r') as f:
+    with codecs.open(join(dirname(abspath(__file__)), text_file), encoding='utf-8') as f:
         long_description.append(f.read())
 
 setup(
     name="halogen",
     description="Python HAL generation/parsing library",
     long_description='\n'.join(long_description),
-    author="Oleg Pidsadnyi",
+    author="Paylogic International",
     license="MIT license",
-    author_email="oleg.podsadny@gmail.com",
-    url="https://github.com/olegpidsadnyi/halogen",
+    author_email="developers@paylogic.com",
+    url="https://github.com/paylogic/halogen",
     version="0.0.5",
     classifiers=[
         "Development Status :: 6 - Mature",
