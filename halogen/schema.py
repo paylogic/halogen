@@ -179,18 +179,15 @@ class Attr(object):
         if self.compartment is not None:
             compartment = value[self.compartment]
 
-        if self.name in compartment:
-            try:
-                value = compartment[self.key]
-            except KeyError:
-                if not hasattr(self, "default"):
-                    raise
+        try:
+            value = compartment[self.key]
+        except KeyError:
+            if hasattr(self, "default"):
                 value = self.default
+            else:
+                raise
 
-            return self.attr_type.deserialize(value)
-
-        elif self.required:
-            raise exceptions.ValidationError("Missing attribute.", self.key)
+        return self.attr_type.deserialize(value)
 
     def __repr__(self):
         """Attribute representation."""
@@ -379,6 +376,11 @@ class _Schema(types.Type):
             except exceptions.ValidationError as e:
                 e.attr = attr.name
                 errors.append(e)
+            except KeyError:
+                if attr.required:
+                    e = exceptions.ValidationError("Missing attribute.", attr.name)
+                    e.attr = attr.name
+                    errors.append(e)
 
         if errors:
             raise exceptions.ValidationError(errors)
