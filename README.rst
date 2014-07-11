@@ -1,14 +1,11 @@
 halogen
 =======
 
-.. image:: https://api.travis-ci.org/olegpidsadnyi/halogen.png
-   :target: https://travis-ci.org/olegpidsadnyi/halogen
+.. image:: https://api.travis-ci.org/paylogic/halogen.png
+   :target: https://travis-ci.org/paylogic/halogen
 
-.. image:: https://pypip.in/v/halogen/badge.png
-   :target: https://crate.io/packages/halogen/
-
-.. image:: https://coveralls.io/repos/olegpidsadnyi/halogen/badge.png?branch=master
-   :target: https://coveralls.io/r/olegpidsadnyi/halogen
+.. image:: https://coveralls.io/repos/paylogic/halogen/badge.png?branch=master
+   :target: https://coveralls.io/r/paylogic/halogen
 
 
 Python HAL generation/parsing library.
