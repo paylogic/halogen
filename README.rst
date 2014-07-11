@@ -4,6 +4,9 @@ halogen
 .. image:: https://api.travis-ci.org/paylogic/halogen.png
    :target: https://travis-ci.org/paylogic/halogen
 
+.. image:: https://pypip.in/v/halogen/badge.png
+   :target: https://crate.io/packages/halogen/
+
 .. image:: https://coveralls.io/repos/paylogic/halogen/badge.png?branch=master
    :target: https://coveralls.io/r/paylogic/halogen
 
@@ -778,18 +781,3 @@ Resource:
 .. code-block:: python
 
     {"price": Amount: EUR 0.3, "title": "Pencil"}
-
-
-Contact
--------
-
-If you have questions, bug reports, suggestions, etc. please create an issue on
-the `GitHub project page <http://github.com/paylogic/halogen>`_.
-
-
-License
--------
-
-This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
-
-See `License <https://github.com/paylogic/halogen/blob/master/LICENSE.txt>`_
