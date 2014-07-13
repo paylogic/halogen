@@ -387,7 +387,7 @@ class _Schema(types.Type):
         if output is None:
             return result
         for attr in cls.__attrs__:
-            if attr.name is result:
+            if attr.name in result:
                 attr.accessor.set(output, result[attr.name])
 
 
