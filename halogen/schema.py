@@ -3,8 +3,8 @@
 import sys
 import inspect
 
-from . import types
-from . import exceptions
+from halogen import types
+from halogen import exceptions
 
 PY2 = sys.version_info[0] == 2
 
