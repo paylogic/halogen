@@ -33,5 +33,9 @@ class List(Type):
         self.item_type = item_type or Type
 
     def serialize(self, value, **kwargs):
-        """Overrided serialize for returning list of value's items."""
+        """Serialize every item of the list."""
         return [self.item_type.serialize(val, **kwargs) for val in value]
+
+    def deserialize(self, value, **kwargs):
+        """Deserialize every item of the list."""
+        return [self.item_type.deserialize(val, **kwargs) for val in value]
