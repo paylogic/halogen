@@ -27,10 +27,15 @@ class List(Type):
 
     """List type for Halogen schema attribute."""
 
-    def __init__(self, item_type=None):
-        """Create a new List."""
+    def __init__(self, item_type=None, allow_scalar=False):
+        """Create a new List.
+
+        :param item_type: Item type or schema.
+        :param allow_scalar: Automatically convert scalar value to the list.
+        """
         super(List, self).__init__()
         self.item_type = item_type or Type
+        self.allow_scalar = allow_scalar
 
     def serialize(self, value, **kwargs):
         """Serialize every item of the list."""
@@ -38,4 +43,6 @@ class List(Type):
 
     def deserialize(self, value, **kwargs):
         """Deserialize every item of the list."""
+        if self.allow_scalar and not isinstance(value, (list, tuple)):
+            value = [value]
         return [self.item_type.deserialize(val, **kwargs) for val in value]
