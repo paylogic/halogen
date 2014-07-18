@@ -5,6 +5,15 @@ class Type(object):
 
     """Base class for creating types."""
 
+    def __init__(self, validators=None, *args, **kwargs):
+        """Type constructor.
+
+        :param validators: A list of :class:`halogen.validators.Validator` objects that check the validity of the
+            deserialized value. Validators raise :class:`halogen.exception.ValidationError` exceptions when
+            value is not valid.
+        """
+        self.validators = validators or []
+
     @classmethod
     def serialize(cls, value):
         """Serialization of value."""
@@ -12,7 +21,11 @@ class Type(object):
 
     @classmethod
     def deserialize(cls, value):
-        """Deserialization of value."""
+        """Deserialization of value.
+
+        :return: Deserialized value.
+        :raises: :class:`halogen.exception.ValidationError` exception is value is not valid.
+        """
         return value
 
     @staticmethod
@@ -27,13 +40,13 @@ class List(Type):
 
     """List type for Halogen schema attribute."""
 
-    def __init__(self, item_type=None, allow_scalar=False):
+    def __init__(self, item_type=None, allow_scalar=False, *args, **kwargs):
         """Create a new List.
 
         :param item_type: Item type or schema.
         :param allow_scalar: Automatically convert scalar value to the list.
         """
-        super(List, self).__init__()
+        super(List, self).__init__(*args, **kwargs)
         self.item_type = item_type or Type
         self.allow_scalar = allow_scalar
 
