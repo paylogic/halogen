@@ -1,5 +1,6 @@
 from .schema import Schema, Attr, Link, Curie, Embedded, Accessor
 from . import types
+from . import validators
 
 __all__ = [
     "Accessor",
@@ -9,4 +10,5 @@ __all__ = [
     "Curie",
     "Embedded",
     "types",
+    "validators",
 ]
