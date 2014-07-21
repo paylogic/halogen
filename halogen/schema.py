@@ -107,7 +107,7 @@ class Attr(object):
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param required: Is attribute required to be present.
         """
-        self.attr_type = attr_type or types.Type
+        self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required
 

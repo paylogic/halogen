@@ -14,18 +14,20 @@ class Type(object):
         """
         self.validators = validators or []
 
-    @classmethod
-    def serialize(cls, value):
+    def serialize(self, value):
         """Serialization of value."""
         return value
 
-    @classmethod
-    def deserialize(cls, value):
+    def deserialize(self, value):
         """Deserialization of value.
 
         :return: Deserialized value.
         :raises: :class:`halogen.exception.ValidationError` exception is value is not valid.
         """
+        if value is not None:
+            for validator in self.validators:
+                validator.validate(value)
+
         return value
 
     @staticmethod
@@ -47,7 +49,7 @@ class List(Type):
         :param allow_scalar: Automatically convert scalar value to the list.
         """
         super(List, self).__init__(*args, **kwargs)
-        self.item_type = item_type or Type
+        self.item_type = item_type or Type()
         self.allow_scalar = allow_scalar
 
     def serialize(self, value, **kwargs):
@@ -56,6 +58,10 @@ class List(Type):
 
     def deserialize(self, value, **kwargs):
         """Deserialize every item of the list."""
+
         if self.allow_scalar and not isinstance(value, (list, tuple)):
             value = [value]
+
+        value = super(List, self).deserialize(value)
+
         return [self.item_type.deserialize(val, **kwargs) for val in value]

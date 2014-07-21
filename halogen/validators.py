@@ -44,3 +44,44 @@ class Length(Validator):
 
         if self.max_length is not None and length > self.max_length:
             raise exceptions.ValidationError("Length is greater than {0}".format(self.max_length))
+
+
+class Range(object):
+
+    """Validator which succeeds if the value it is passed is greater or equal to ``min`` and less than or equal to
+    ``max``.  If ``min`` is not specified, or is specified as ``None``, no lower bound exists.  If ``max`` is not
+    specified, or is specified as ``None``, no upper bound exists.
+    """
+
+    min_err = '{val} is less than minimum value {min}'
+    max_err = '{val} is greater than maximum value {max}'
+
+    def __init__(self, min=None, max=None, min_err=None, max_err=None):
+        """Range validator constructor.
+        :param min: Minimal value of range, optional.
+        :param max: Maximal value of range, optional.
+        :param min_err: ValidationError message if value is less than minimal value of range.
+        :param max_err: ValidationError message if value is greater than maximal value of range.
+        """
+        self.min = min
+        self.max = max
+        if min_err is not None:
+            self.min_err = min_err
+        if max_err is not None:
+            self.max_err = max_err
+
+    def validate(self, value):
+        """Validate value.
+
+        :param value: Value which should be validated.
+
+        :raises: :class:`halogen.exception.ValidationError` exception when either if value less than min in case when
+        min is not None or if value greater than max in case when max is not None.
+        """
+        if self.min is not None:
+            if value < self.min:
+                raise exceptions.ValidationError(self.min_err.format(val=value, min=self.min))
+
+        if self.max is not None:
+            if value > self.max:
+                raise exceptions.ValidationError(self.max_err.format(val=value, max=self.max))
