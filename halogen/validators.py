@@ -1,6 +1,6 @@
 """Halogen basic type validators."""
 
-from . import exceptions
+from halogen import exceptions
 
 
 class Validator(object):

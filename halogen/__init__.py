@@ -1,4 +1,4 @@
-from .schema import Schema, Attr, Link, Curie, Embedded, Accessor
+from halogen.schema import Schema, Attr, Link, Curie, Embedded, Accessor
 from halogen import types
 from halogen import validators
 
