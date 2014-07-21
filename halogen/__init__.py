@@ -1,6 +1,6 @@
 from .schema import Schema, Attr, Link, Curie, Embedded, Accessor
-from . import types
-from . import validators
+from halogen import types
+from halogen import validators
 
 __all__ = [
     "Accessor",
