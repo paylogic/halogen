@@ -24,9 +24,8 @@ class Type(object):
         :return: Deserialized value.
         :raises: :class:`halogen.exception.ValidationError` exception is value is not valid.
         """
-        if value is not None:
-            for validator in self.validators:
-                validator.validate(value)
+        for validator in self.validators:
+            validator.validate(value)
 
         return value
 
