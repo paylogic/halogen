@@ -21,7 +21,10 @@ class Length(Validator):
 
     """Length validator that checks the length of a List-like type."""
 
-    def __init__(self, min_length=None, max_length=None):
+    min_err = "Length is less than {0}"
+    max_err = "Length is greater than {0}"
+
+    def __init__(self, min_length=None, max_length=None, min_err=None, max_err=None):
         """Length validator constructor.
 
         :param min_length: Minimum length, optional.
@@ -29,6 +32,12 @@ class Length(Validator):
         """
         self.min_length = min_length
         self.max_length = max_length
+
+        if min_err is not None:
+            self.min_err = min_err
+
+        if max_err is not None:
+            self.max_err = max_err
 
     def validate(self, value):
         """Validate the length of a list.
@@ -39,11 +48,12 @@ class Length(Validator):
             minimum or greater than maximum.
         """
         length = len(value)
+
         if self.min_length is not None and length < self.min_length:
-            raise exceptions.ValidationError("Length is less than {0}".format(self.min_length))
+            raise exceptions.ValidationError(self.min_err.format(self.min_length))
 
         if self.max_length is not None and length > self.max_length:
-            raise exceptions.ValidationError("Length is greater than {0}".format(self.max_length))
+            raise exceptions.ValidationError(self.max_err.format(self.max_length))
 
 
 class Range(object):
