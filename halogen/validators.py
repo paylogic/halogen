@@ -47,7 +47,10 @@ class Length(Validator):
         :raises: :class:`halogen.exception.ValidationError` exception when length of the list is less than
             minimum or greater than maximum.
         """
-        length = len(value)
+        try:
+            length = len(value)
+        except TypeError:
+            length = 0
 
         if self.min_length is not None and length < self.min_length:
             raise exceptions.ValidationError(self.min_err.format(self.min_length))
