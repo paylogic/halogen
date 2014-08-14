@@ -39,7 +39,7 @@ setup(
     license="MIT license",
     author_email="developers@paylogic.com",
     url="https://github.com/paylogic/halogen",
-    version="0.0.9",
+    version="0.1.0",
     classifiers=[
         "Development Status :: 6 - Mature",
         "Intended Audience :: Developers",

@@ -180,7 +180,7 @@ class Attr(object):
             compartment = value[self.compartment]
 
         try:
-            value = compartment[self.key]
+            value = self.accessor.get(compartment)
         except KeyError:
             if hasattr(self, "default"):
                 value = self.default
