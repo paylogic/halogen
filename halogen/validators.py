@@ -17,6 +17,44 @@ class Validator(object):
         """
 
 
+class LessThanEqual(Validator):
+
+    value_err = "{0} is bigger than {1}"
+
+    def __init__(self, value, value_err=None):
+
+        self.value = value() if callable(value) else value
+
+        if value_err is not None:
+            self.value_err = value_err
+
+    def validate(self, value):
+
+        if value > self.value:
+            raise exceptions.ValidationError(self.value_err.format(value, self.value))
+
+        return True
+
+
+class GreatThanEqual(Validator):
+
+    value_err = "{0} is smaller than {1}"
+
+    def __init__(self, value, value_err=None):
+
+        self.value = value() if callable(value) else value
+
+        if value_err is not None:
+            self.value_err = value_err
+
+    def validate(self, value):
+
+        if value < self.value:
+            raise exceptions.ValidationError(self.value_err.format(value, self.value))
+
+        return True
+
+
 class Length(Validator):
 
     """Length validator that checks the length of a List-like type."""
@@ -92,9 +130,9 @@ class Range(object):
         min is not None or if value greater than max in case when max is not None.
         """
         if self.min is not None:
-            if value < self.min:
+            if value < (self.min() if callable(self.min) else self.min):
                 raise exceptions.ValidationError(self.min_err.format(val=value, min=self.min))
 
         if self.max is not None:
-            if value > self.max:
+            if value > (self.max() if callable(self.max) else self.max):
                 raise exceptions.ValidationError(self.max_err.format(val=value, max=self.max))

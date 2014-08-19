@@ -156,7 +156,7 @@ class Attr(object):
             except (AttributeError, KeyError):
                 if not hasattr(self, "default") and self.required:
                     raise
-                value = self.default
+                value = self.default() if callable(self.default) else self.default
 
             return self.attr_type.serialize(value, **_get_context(self.attr_type.serialize, kwargs))
 
