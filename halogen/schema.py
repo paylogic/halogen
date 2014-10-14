@@ -249,9 +249,10 @@ class Link(Attr):
 
         :note: Links support curies.
         """
+        name = self._key or self.name
         if self.curie is None:
-            return self._key or self.name
-        return ":".join((self.curie.name, self.name))
+            return name
+        return ":".join((self.curie.name, name))
 
     def deserialize(self, value):
         """Link doesn't support deserialization."""
