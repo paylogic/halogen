@@ -348,7 +348,7 @@ class _Schema(types.Type):
         for attr in cls.__attrs__:
             compartment = result
             if attr.compartment is not None:
-                compartment = result.setdefault(attr.compartment, {})
+                compartment = result.setdefault(attr.compartment, cls.dict_type())
             try:
                 compartment[attr.key] = attr.serialize(value, **kwargs)
             except (AttributeError, KeyError):
