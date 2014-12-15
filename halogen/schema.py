@@ -327,6 +327,8 @@ class Embedded(Attr):
 class _Schema(types.Type):
 
     """Type for creating schema."""
+    
+    dict_type = dict
 
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
@@ -342,7 +344,7 @@ class _Schema(types.Type):
 
     @classmethod
     def serialize(cls, value, **kwargs):
-        result = {}
+        result = cls.dict_type()
         for attr in cls.__attrs__:
             compartment = result
             if attr.compartment is not None:
