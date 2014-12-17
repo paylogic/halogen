@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 import halogen
+import json
 
 
 class Amount(object):
@@ -74,3 +75,15 @@ def test_nested():
         },
         "is_friend": True
     }
+
+
+def test_creation_counter():
+    nested_data = {
+        "person": Person("John", "Smith"),
+        "is_friend": True,
+        "price": Amount("EUR", Decimal("13.37")),
+    }
+    serialized = NestedSchema.serialize(nested_data)
+    jsonstr = json.dumps(serialized)
+    assert jsonstr.find('"person"') < jsonstr.find('"is_friend"')
+    assert jsonstr.find('"is_friend"') < jsonstr.find('"price"')

@@ -3,6 +3,11 @@
 import sys
 import inspect
 
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict  # noqa
+
 from halogen import types
 from halogen import exceptions
 
@@ -100,6 +105,8 @@ class Attr(object):
 
     """Schema attribute."""
 
+    creation_counter = 0
+
     def __init__(self, attr_type=None, attr=None, required=True, **kwargs):
         """Attribute constructor.
 
@@ -113,6 +120,9 @@ class Attr(object):
 
         if "default" in kwargs:
             self.default = kwargs["default"]
+
+        self.creation_counter = Attr.creation_counter
+        Attr.creation_counter += 1
 
     @property
     def compartment(self):
@@ -327,8 +337,8 @@ class Embedded(Attr):
 class _Schema(types.Type):
 
     """Type for creating schema."""
-    
-    dict_type = dict
+
+    dict_type = OrderedDict
 
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
@@ -403,8 +413,13 @@ class _SchemaType(type):
         cls.__class_attrs__ = []
         curies = set([])
 
+        attrs = sorted(
+            [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)],
+            key=lambda x: x[1].creation_counter
+        )
+
         # Collect the attributes and set their names.
-        for name, value in clsattrs.items():
+        for name, value in attrs:
             if isinstance(value, Attr):
 
                 delattr(cls, name)
