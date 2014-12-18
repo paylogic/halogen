@@ -77,13 +77,20 @@ def test_nested():
     }
 
 
+class OrderedSchema(halogen.Schema):
+    self = halogen.Link('http://somewhere.com')
+    foo = halogen.Attr('bar')
+    hello = halogen.Attr()
+    person = halogen.Embedded(PersonSchema)
+
+
 def test_creation_counter():
-    nested_data = {
+    """Test that JSON fields are in the order which they were defined in Python"""
+    data = {
+        "hello": "world",
         "person": Person("John", "Smith"),
-        "is_friend": True,
-        "price": Amount("EUR", Decimal("13.37")),
     }
-    serialized = NestedSchema.serialize(nested_data)
-    jsonstr = json.dumps(serialized)
-    assert jsonstr.find('"person"') < jsonstr.find('"is_friend"')
-    assert jsonstr.find('"is_friend"') < jsonstr.find('"price"')
+    serialized = OrderedSchema.serialize(data)
+    rv = json.dumps(serialized)
+    assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": '
+                  '"world", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}')
