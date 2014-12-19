@@ -53,7 +53,7 @@ class Accessor(object):
         assert self.getter is not None, "Getter accessor is not specified."
         if callable(self.getter):
             rv = self.getter(obj, **_get_context(self.getter, kwargs))
-            if rv is None and required:
+            if rv is None and not required:
                 raise AttributeError()
             return rv
 
