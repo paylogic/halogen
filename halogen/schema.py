@@ -311,14 +311,14 @@ class Embedded(Attr):
 
     """Embedded attribute of schema."""
 
-    def __init__(self, attr_type=None, attr=None, curie=None):
+    def __init__(self, attr_type=None, attr=None, curie=None, **kwargs):
         """Embedded constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param curie: The curie used for this embedded attribute.
         """
-        super(Embedded, self).__init__(attr_type, attr)
+        super(Embedded, self).__init__(attr_type, attr, **kwargs)
         self.curie = curie
 
     @property
@@ -364,7 +364,8 @@ class _Schema(types.Type):
             except (AttributeError, KeyError):
                 if attr.required:
                     raise
-
+            if len(compartment.keys()) == 0:
+                del result[attr.compartment]
         return result
 
     @classmethod

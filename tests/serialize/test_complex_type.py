@@ -94,3 +94,21 @@ def test_creation_counter():
     rv = json.dumps(serialized)
     assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": '
                   '"world", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}')
+
+
+class UnrequiredEmbeddedSchema(halogen.Schema):
+    self = halogen.Link('http://somewhere.com')
+    foo = halogen.Attr('bar')
+    person = halogen.Embedded(PersonSchema, required=False)
+
+
+def test_embedded_attr_with_no_value():
+    """Test that the _embedded compartment does not exist in a serialized document if none of the
+    embedded resource are required."""
+    data = {
+        "hello": "world",
+        "person": None,
+    }
+    serialized = UnrequiredEmbeddedSchema.serialize(data)
+    rv = json.dumps(serialized)
+    assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar"}')
