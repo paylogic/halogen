@@ -128,9 +128,9 @@ def test_link_with_no_value_when_not_required_does_not_render():
 
 def test_embedded_list_with_embedded_attr_with_no_value():
     class UnrequiredEmbeddedSchema(halogen.Schema):
-            self = halogen.Link('http://somewhere.com')
-            foo = halogen.Attr('bar')
-            person = halogen.Embedded(PersonSchema, required=False)
+        self = halogen.Link('http://somewhere.com')
+        foo = halogen.Attr('bar')
+        person = halogen.Embedded(PersonSchema, required=False)
 
     class UnrequiredEmbeddedSchemaCollection(halogen.Schema):
         items = halogen.Embedded(attr_type=halogen.types.List(UnrequiredEmbeddedSchema))
