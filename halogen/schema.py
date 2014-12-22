@@ -3,6 +3,11 @@
 import sys
 import inspect
 
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict  # noqa
+
 from halogen import types
 from halogen import exceptions
 
@@ -100,6 +105,8 @@ class Attr(object):
 
     """Schema attribute."""
 
+    creation_counter = 0
+
     def __init__(self, attr_type=None, attr=None, required=True, **kwargs):
         """Attribute constructor.
 
@@ -113,6 +120,9 @@ class Attr(object):
 
         if "default" in kwargs:
             self.default = kwargs["default"]
+
+        self.creation_counter = Attr.creation_counter
+        Attr.creation_counter += 1
 
     @property
     def compartment(self):
@@ -342,11 +352,11 @@ class _Schema(types.Type):
 
     @classmethod
     def serialize(cls, value, **kwargs):
-        result = {}
+        result = OrderedDict()
         for attr in cls.__attrs__:
             compartment = result
             if attr.compartment is not None:
-                compartment = result.setdefault(attr.compartment, {})
+                compartment = result.setdefault(attr.compartment, OrderedDict())
             try:
                 compartment[attr.key] = attr.serialize(value, **kwargs)
             except (AttributeError, KeyError):
@@ -401,17 +411,20 @@ class _SchemaType(type):
         cls.__class_attrs__ = []
         curies = set([])
 
+        attrs = [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)]
+        attrs.sort(key=lambda attr: attr[1].creation_counter)
+
         # Collect the attributes and set their names.
-        for name, value in clsattrs.items():
-            if isinstance(value, Attr):
+        for name, attr in attrs:
+            if isinstance(attr, Attr):
 
                 delattr(cls, name)
-                cls.__class_attrs__.append(value)
-                if not hasattr(value, "name"):
-                    value.name = name
+                cls.__class_attrs__.append(attr)
+                if not hasattr(attr, "name"):
+                    attr.name = name
 
-                if isinstance(value, (Link, Embedded)):
-                    curie = getattr(value, "curie", None)
+                if isinstance(attr, (Link, Embedded)):
+                    curie = getattr(attr, "curie", None)
                     if curie is not None:
                         curies.add(curie)
 

@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 import halogen
+import json
 
 
 class Amount(object):
@@ -74,3 +75,32 @@ def test_nested():
         },
         "is_friend": True
     }
+
+
+def test_creation_counter():
+    """Test that JSON fields are in the order which they were defined in Python"""
+    class OrderedSchema1(halogen.Schema):
+        self = halogen.Link('http://somewhere.com')
+        foo = halogen.Attr('bar')
+        hello = halogen.Attr()
+        person = halogen.Embedded(PersonSchema)
+
+    data = {
+        "hello": "world",
+        "person": Person("John", "Smith"),
+    }
+    serialized = OrderedSchema1.serialize(data)
+    rv = json.dumps(serialized)
+    assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": '
+                  '"world", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}')
+
+    class OrderedSchema2(halogen.Schema):
+        self = halogen.Link('http://somewhere.com')
+        hello = halogen.Attr()
+        foo = halogen.Attr('bar')
+        person = halogen.Embedded(PersonSchema)
+
+    serialized = OrderedSchema2.serialize(data)
+    rv = json.dumps(serialized)
+    assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "hello": "world", '
+                  '"foo": "bar", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}')
