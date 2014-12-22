@@ -30,7 +30,7 @@ def test_serialize_type(mocked_get_context):
     accessor.assert_called_with()
 
     # Was the get() function of the accessor used?
-    accessor_mock.get.assert_called_with(data)
+    accessor_mock.get.assert_called_with(data, True)
 
     # Was the serialize function of the Type used to serialize the result of get?
     attr_type.serialize.assert_called_with("value")

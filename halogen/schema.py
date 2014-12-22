@@ -3,6 +3,11 @@
 import sys
 import inspect
 
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict  # noqa
+
 from halogen import types
 from halogen import exceptions
 
@@ -39,7 +44,7 @@ class Accessor(object):
         self.getter = getter
         self.setter = setter
 
-    def get(self, obj, **kwargs):
+    def get(self, obj, required=True, **kwargs):
         """Get an attribute from a value.
 
         :param obj: Object to get the attribute value from.
@@ -47,7 +52,10 @@ class Accessor(object):
         """
         assert self.getter is not None, "Getter accessor is not specified."
         if callable(self.getter):
-            return self.getter(obj, **_get_context(self.getter, kwargs))
+            rv = self.getter(obj, **_get_context(self.getter, kwargs))
+            if rv is None and not required:
+                raise AttributeError()
+            return rv
 
         assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
 
@@ -100,6 +108,8 @@ class Attr(object):
 
     """Schema attribute."""
 
+    creation_counter = 0
+
     def __init__(self, attr_type=None, attr=None, required=True, **kwargs):
         """Attribute constructor.
 
@@ -113,6 +123,9 @@ class Attr(object):
 
         if "default" in kwargs:
             self.default = kwargs["default"]
+
+        self.creation_counter = Attr.creation_counter
+        Attr.creation_counter += 1
 
     @property
     def compartment(self):
@@ -152,14 +165,12 @@ class Attr(object):
         """
         if types.Type.is_type(self.attr_type):
             try:
-                value = self.accessor.get(value, **kwargs)
-            except (AttributeError, KeyError):
+                value = self.accessor.get(value, self.required, **kwargs)
+            except (AttributeError, KeyError) as e:
                 if not hasattr(self, "default") and self.required:
                     raise
                 value = self.default() if callable(self.default) else self.default
-
             return self.attr_type.serialize(value, **_get_context(self.attr_type.serialize, kwargs))
-
         return self.attr_type
 
     def deserialize(self, value):
@@ -180,7 +191,7 @@ class Attr(object):
             compartment = value[self.compartment]
 
         try:
-            value = self.accessor.get(compartment)
+            value = self.accessor.get(compartment, self.required)
         except KeyError:
             if hasattr(self, "default"):
                 value = self.default
@@ -214,7 +225,6 @@ class Link(Attr):
                            the target resource.
         """
         if not types.Type.is_type(attr_type):
-
             if attr_type is not None:
                 attr = BYPASS
 
@@ -301,14 +311,14 @@ class Embedded(Attr):
 
     """Embedded attribute of schema."""
 
-    def __init__(self, attr_type=None, attr=None, curie=None):
+    def __init__(self, attr_type=None, attr=None, curie=None, **kwargs):
         """Embedded constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param curie: The curie used for this embedded attribute.
         """
-        super(Embedded, self).__init__(attr_type, attr)
+        super(Embedded, self).__init__(attr_type, attr, **kwargs)
         self.curie = curie
 
     @property
@@ -328,6 +338,8 @@ class _Schema(types.Type):
 
     """Type for creating schema."""
 
+    dict_type = OrderedDict
+
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
         schema = type("Schema", (cls, ), {"__doc__": cls.__doc__})
@@ -342,17 +354,18 @@ class _Schema(types.Type):
 
     @classmethod
     def serialize(cls, value, **kwargs):
-        result = {}
+        result = cls.dict_type()
         for attr in cls.__attrs__:
             compartment = result
             if attr.compartment is not None:
-                compartment = result.setdefault(attr.compartment, {})
+                compartment = result.setdefault(attr.compartment, cls.dict_type())
             try:
                 compartment[attr.key] = attr.serialize(value, **kwargs)
             except (AttributeError, KeyError):
                 if attr.required:
                     raise
-
+            if len(compartment.keys()) == 0:
+                del result[attr.compartment]
         return result
 
     @classmethod
@@ -401,8 +414,13 @@ class _SchemaType(type):
         cls.__class_attrs__ = []
         curies = set([])
 
+        attrs = sorted(
+            [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)],
+            key=lambda x: x[1].creation_counter
+        )
+
         # Collect the attributes and set their names.
-        for name, value in clsattrs.items():
+        for name, value in attrs:
             if isinstance(value, Attr):
 
                 delattr(cls, name)
