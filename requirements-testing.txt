@@ -1,5 +1,4 @@
 mock
-ordereddict
 pytest-cache
 pytest-cov
 pytest-pep8
