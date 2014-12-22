@@ -7,6 +7,12 @@ from os.path import abspath, dirname, join
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
+try:
+    from collections import OrderedDict  # noqa
+    install_requires = []
+except ImportError:
+    install_requires = ['ordereddict']
+
 
 class ToxTestCommand(TestCommand):
 
@@ -55,5 +61,6 @@ setup(
     ] + [("Programming Language :: Python :: %s" % x) for x in "2.6 2.7 3.4".split()],
     cmdclass={"test": ToxTestCommand},
     packages=["halogen"],
+    install_requires=install_requires,
     tests_require=["detox"],
 )
