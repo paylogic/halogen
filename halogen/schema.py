@@ -338,8 +338,6 @@ class _Schema(types.Type):
 
     """Type for creating schema."""
 
-    dict_type = OrderedDict
-
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
         schema = type("Schema", (cls, ), {"__doc__": cls.__doc__})
@@ -354,11 +352,11 @@ class _Schema(types.Type):
 
     @classmethod
     def serialize(cls, value, **kwargs):
-        result = cls.dict_type()
+        result = OrderedDict()
         for attr in cls.__attrs__:
             compartment = result
             if attr.compartment is not None:
-                compartment = result.setdefault(attr.compartment, cls.dict_type())
+                compartment = result.setdefault(attr.compartment, OrderedDict())
             try:
                 compartment[attr.key] = attr.serialize(value, **kwargs)
             except (AttributeError, KeyError):
@@ -413,22 +411,20 @@ class _SchemaType(type):
         cls.__class_attrs__ = []
         curies = set([])
 
-        attrs = sorted(
-            [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)],
-            key=lambda x: x[1].creation_counter
-        )
+        attrs = [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)]
+        attrs.sort(key=lambda attr: attr[1].creation_counter)
 
         # Collect the attributes and set their names.
-        for name, value in attrs:
-            if isinstance(value, Attr):
+        for name, attr in attrs:
+            if isinstance(attr, Attr):
 
                 delattr(cls, name)
-                cls.__class_attrs__.append(value)
-                if not hasattr(value, "name"):
-                    value.name = name
+                cls.__class_attrs__.append(attr)
+                if not hasattr(attr, "name"):
+                    attr.name = name
 
-                if isinstance(value, (Link, Embedded)):
-                    curie = getattr(value, "curie", None)
+                if isinstance(attr, (Link, Embedded)):
+                    curie = getattr(attr, "curie", None)
                     if curie is not None:
                         curies.add(curie)
 
