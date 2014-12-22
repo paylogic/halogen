@@ -3,7 +3,7 @@
 import halogen
 import mock
 import pytest
-from fixtures.common import *
+from .fixtures.common import *
 
 
 @pytest.fixture(scope="session")
