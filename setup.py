@@ -41,7 +41,7 @@ setup(
     name="halogen",
     description="Python HAL generation/parsing library",
     long_description='\n'.join(long_description),
-    author="Paylogic International",
+    author="Oleg Pidsadnyi, Paylogic International and others",
     license="MIT license",
     author_email="developers@paylogic.com",
     url="https://github.com/paylogic/halogen",
