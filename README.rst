@@ -798,4 +798,4 @@ This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/M
 See `License <https://github.com/paylogic/halogen/blob/master/LICENSE.txt>`_
 
 
-© 2013 Paylogic International.
+© 2013 Oleg Pidsadnyi, Paylogic International and others.
