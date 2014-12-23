@@ -781,3 +781,21 @@ Resource:
 .. code-block:: python
 
     {"price": Amount: EUR 0.3, "title": "Pencil"}
+
+
+Contact
+-------
+
+If you have questions, bug reports, suggestions, etc. please create an issue on
+the `GitHub project page <http://github.com/paylogic/halogen>`_.
+
+
+License
+-------
+
+This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
+
+See `License <https://github.com/paylogic/halogen/blob/master/LICENSE.txt>`_
+
+
+© 2013 Paylogic International.
