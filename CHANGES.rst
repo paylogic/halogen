@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ----------
 
-* Allow Embedded fields to marked as not required (mattupstate)
+* Allow Embedded fields to be marked as not required (mattupstate)
 * Field order is preserved in serialized documents (mattupstate)
 
 1.0.0
