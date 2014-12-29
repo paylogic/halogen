@@ -311,14 +311,14 @@ class Embedded(Attr):
 
     """Embedded attribute of schema."""
 
-    def __init__(self, attr_type=None, attr=None, curie=None):
+    def __init__(self, attr_type=None, attr=None, curie=None, required=True):
         """Embedded constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param curie: The curie used for this embedded attribute.
         """
-        super(Embedded, self).__init__(attr_type, attr)
+        super(Embedded, self).__init__(attr_type=attr_type, attr=attr, required=required)
         self.curie = curie
 
     @property
@@ -362,7 +362,8 @@ class _Schema(types.Type):
             except (AttributeError, KeyError):
                 if attr.required:
                     raise
-
+            if attr.compartment is not None and len(compartment) == 0:
+                del result[attr.compartment]
         return result
 
     @classmethod
@@ -416,17 +417,15 @@ class _SchemaType(type):
 
         # Collect the attributes and set their names.
         for name, attr in attrs:
-            if isinstance(attr, Attr):
+            delattr(cls, name)
+            cls.__class_attrs__.append(attr)
+            if not hasattr(attr, "name"):
+                attr.name = name
 
-                delattr(cls, name)
-                cls.__class_attrs__.append(attr)
-                if not hasattr(attr, "name"):
-                    attr.name = name
-
-                if isinstance(attr, (Link, Embedded)):
-                    curie = getattr(attr, "curie", None)
-                    if curie is not None:
-                        curies.add(curie)
+            if isinstance(attr, (Link, Embedded)):
+                curie = getattr(attr, "curie", None)
+                if curie is not None:
+                    curies.add(curie)
 
         # Collect CURIEs and create the link attribute
 

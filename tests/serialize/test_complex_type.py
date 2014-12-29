@@ -105,3 +105,15 @@ def test_creation_counter():
     rv = json.dumps(serialized)
     assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "hello": "world", '
                   '"foo": "bar", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}')
+
+
+def test_empty_compartment_does_not_appear():
+    """Test that an empty compartment does not appear in a serialized document."""
+
+    class Schema(halogen.Schema):
+        user1 = halogen.Embedded(PersonSchema, required=False)
+        user2 = halogen.Embedded(PersonSchema)
+
+    serialized = Schema.serialize({'user2': Person("John", "Smith")})
+    rv = json.dumps(serialized)
+    assert rv == '{"_embedded": {"user2": {"name": "John", "surname": "Smith"}}}'
