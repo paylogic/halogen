@@ -18,17 +18,25 @@ class ToxTestCommand(TestCommand):
 
     """Test command which runs tox under the hood."""
 
+    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
+
+    def initialize_options(self):
+        """Initialize options and set their defaults."""
+        TestCommand.initialize_options(self)
+        self.tox_args = '--recreate'
+
     def finalize_options(self):
         """Add options to the test runner (tox)."""
         TestCommand.finalize_options(self)
-        self.test_args = ['--recreate']
+        self.test_args = []
         self.test_suite = True
 
     def run_tests(self):
         """Invoke the test runner (tox)."""
-        # import here, cause outside the eggs aren't loaded
-        import detox.main
-        errno = detox.main.main(self.test_args)
+        #import here, cause outside the eggs aren't loaded
+        import tox
+        import shlex
+        errno = tox.cmdline(args=shlex.split(self.tox_args))
         sys.exit(errno)
 
 long_description = []
@@ -62,5 +70,5 @@ setup(
     cmdclass={"test": ToxTestCommand},
     packages=["halogen"],
     install_requires=install_requires,
-    tests_require=["detox"],
+    tests_require=["tox"],
 )
