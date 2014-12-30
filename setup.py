@@ -7,6 +7,8 @@ from os.path import abspath, dirname, join
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
+import halogen
+
 try:
     from collections import OrderedDict  # noqa
     install_requires = []
@@ -53,7 +55,7 @@ setup(
     license="MIT license",
     author_email="developers@paylogic.com",
     url="https://github.com/paylogic/halogen",
-    version="1.0.3",
+    version=halogen.__version__,
     classifiers=[
         "Development Status :: 6 - Mature",
         "Intended Audience :: Developers",
