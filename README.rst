@@ -20,6 +20,7 @@ complex types and data transformation.
 Library is purposed in representing your data in HAL format in the most obvious way possible, but also
 of the generic web form-like functionality so that your schemas and types can be reused as much as possible.
 
+
 Schema
 ======
 
@@ -36,6 +37,7 @@ Serialization
     >>> {"hello": "Hello World"}
 
 Simply call Schema.serialize() class method which can accept dict or any other object.
+
 
 Validation
 ----------
@@ -140,11 +142,13 @@ Result:
         "name": "Abra Cadabra"
     }
 
+
 Attribute
 ---------
 
 Attributes form the schema and encapsulate the knowledge how to get the data from your model,
 how to transform it according to the specific type.
+
 
 Attr()
 ~~~~~~
@@ -221,6 +225,7 @@ Result:
     }
 
 In some cases also the ``attr`` can be specified to be a callable that returns a constant value.
+
 
 Attr(attr="foo")
 ~~~~~~~~~~~~~~~~
@@ -304,6 +309,7 @@ Result:
         "name": "Abra Cadabra"
     }
 
+
 Attr(attr=Acccessor)
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -311,7 +317,6 @@ In case the schema is used for both directions to serialize and to deserialize t
 can be passed with both ``getter`` and ``setter`` specified.
 ``Getter`` is a string or callable in order to get the value from a model, and ``setter`` is a string or callable
 that knows where the deserialized value should be stored.
-
 
 
 Attr(Type())
@@ -366,6 +371,15 @@ Result:
         "title": "Harry Potter and the Philosopher's Stone"
     }
 
+
+Attr(required=False)
+~~~~~~~~~~~~~~~~~~~~
+
+By default, attributes are required, so when an attribute can not be taken during the serialization, an exception will
+be raised (``AttributeError`` or ``KeyError``, depending on the input).
+It's possible to relax this restriction by passing ``required=False`` to the attribute constructor.
+
+
 Type
 ----
 
@@ -377,11 +391,13 @@ their constructors while declaring your schema.
 Types can raise ``halogen.exceptions.ValidationError`` during deserialization, but serialization
 expects the value that this type knows how to transform.
 
+
 Subclassing types
 ~~~~~~~~~~~~~~~~~
 
 Types that are common in your application can be shared between schemas. This could be the datetime type,
 specific URL type, internationalized strings and any other representation that requires specific format.
+
 
 Type.serialize
 ~~~~~~~~~~~~~~
@@ -447,6 +463,7 @@ HAL
 
 Hypertext Application Language.
 
+
 RFC
 ---
 
@@ -454,12 +471,14 @@ The JSON variant of HAL (application/hal+json) has now been published as an inte
 
 .. _draft-kelly-json-hal: http://tools.ietf.org/html/draft-kelly-json-hal.
 
+
 Link
 ----
 
 Link objects at RFC: link-objects_
 
 .. _link-objects: http://tools.ietf.org/html/draft-kelly-json-hal-06#section-5
+
 
 href
 ----
@@ -469,26 +488,24 @@ The "href" property is REQUIRED.
 ``halogen.Link`` will create ``href`` for you. You just need to point to ``halogen.Link`` either from where or
 what ``halogen.Link`` should put into ``href``.
 
-1) Static variant
+Static variant
+    .. code-block:: python
 
-.. code-block:: python
+        import halogen
 
-    import halogen
+        class EventSchema(halogen.Schema):
 
-    class EventSchema(halogen.Schema):
+            artist = halogen.Link(attr="/artists/some-artist")
 
-        artist = halogen.Link(attr="/artists/some-artist")
+Callable variant
+    .. code-block:: python
 
+        import halogen
 
-2) Callable variant
+        class EventSchema(halogen.Schema):
 
-.. code-block:: python
+            help = halogen.Link(attr=lambda: current_app.config['DOC_URL'])
 
-    import halogen
-
-    class EventSchema(halogen.Schema):
-
-        help = halogen.Link(attr=lambda: current_app.config['DOC_URL'])
 
 CURIE
 ~~~~~
@@ -669,6 +686,33 @@ Result:
         }
     }
 
+By default, embedded resources are required, you can make them not required by passing ``required=False`` to the
+constructor, and empty values will be omitted in the serialization:
+
+.. code-block:: python
+
+    import halogen
+
+    class Schema(halogen.Schema):
+        user1 = halogen.Embedded(PersonSchema, required=False)
+        user2 = halogen.Embedded(PersonSchema)
+
+    serialized = Schema.serialize({'user2': Person("John", "Smith")})
+
+Result:
+
+.. code-block:: json
+
+    {
+        "_embedded": {
+            "user2": {
+                "name": "John",
+                "surname": "Smith"
+            }
+        }
+    }
+
+
 Deserialization
 ===============
 
@@ -723,6 +767,7 @@ Result:
 .. code-block:: python
 
     "Hello World"
+
 
 Type.deserialize
 ----------------
@@ -795,7 +840,7 @@ License
 
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
 
-See `License <https://github.com/paylogic/halogen/blob/master/LICENSE.txt>`_
+See `License file <https://github.com/paylogic/halogen/blob/master/LICENSE.txt>`_
 
 
 © 2013 Oleg Pidsadnyi, Paylogic International and others.
