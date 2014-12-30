@@ -1,6 +1,8 @@
 halogen
 =======
 
+Python HAL generation/parsing library.
+
 .. image:: https://api.travis-ci.org/paylogic/halogen.png
    :target: https://travis-ci.org/paylogic/halogen
 
@@ -9,9 +11,6 @@ halogen
 
 .. image:: https://coveralls.io/repos/paylogic/halogen/badge.png?branch=master
    :target: https://coveralls.io/r/paylogic/halogen
-
-
-Python HAL generation/parsing library.
 
 Halogen takes the advantage of the declarative style serialization with easily extendable schemas.
 Schema combines the knowledge about your data model, attribute mapping and advanced accessing, with
