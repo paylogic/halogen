@@ -197,7 +197,6 @@ class Attr(object):
                 value = self.default
             else:
                 raise
-
         return self.attr_type.deserialize(value)
 
     def __repr__(self):
@@ -385,14 +384,14 @@ class _Schema(types.Type):
             except NotImplementedError:
                 # Links don't support deserialization
                 continue
+            except ValueError as e:
+                errors.append(exceptions.ValidationError(e, attr.name))
             except exceptions.ValidationError as e:
                 e.attr = attr.name
                 errors.append(e)
             except (KeyError, AttributeError):
                 if attr.required:
-                    e = exceptions.ValidationError("Missing attribute.", attr.name)
-                    e.attr = attr.name
-                    errors.append(e)
+                    errors.append(exceptions.ValidationError("Missing attribute.", attr.name))
 
         if errors:
             raise exceptions.ValidationError(errors)

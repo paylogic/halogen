@@ -7,7 +7,6 @@ import pytest
 
 import halogen
 import halogen.types
-from halogen import exceptions
 
 
 class Amount(halogen.types.Type):
@@ -20,7 +19,7 @@ class Amount(halogen.types.Type):
         try:
             amount = Decimal(value["amount"])
         except InvalidOperation:
-            raise exceptions.ValidationError('Invalid decimal for amount.')
+            raise ValueError('Invalid decimal for amount.')
         return dict(
             amount=amount,
             currency=value["currency"],
@@ -103,7 +102,7 @@ def test_nested():
                     "attr": "price",
                     "errors": [
                         {
-                            "type": "str",
+                            "type": "ValueError",
                             "error": "Invalid decimal for amount."
                         }
                     ],
@@ -146,7 +145,7 @@ def test_nested():
                     "attr": "price",
                     "errors": [
                         {
-                            "type": "str",
+                            "type": "ValueError",
                             "error": "Invalid decimal for amount."
                         }
                     ],
@@ -182,7 +181,7 @@ def test_nested():
                     "attr": "price",
                     "errors": [
                         {
-                            "type": "str",
+                            "type": "ValueError",
                             "error": "Invalid decimal for amount."
                         }
                     ],
