@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.5
+-----
+
+* Respect ValueError in deserialization of the attributes (bubenkoff)
+
 1.0.4
 -----
 

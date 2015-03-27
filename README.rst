@@ -948,6 +948,10 @@ Result:
         "attr": "<root>"
     }
 
+Note that should ``ValueError`` exception happen on the attribute deserialization, it will be caught and reraized
+as ``halogen.exceptions.ValidationError``. This is to eliminate the need of raising halogen specific exceptions in
+types and attributes during the deserialization.
+
 
 Contact
 -------
