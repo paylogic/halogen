@@ -19,7 +19,8 @@ else:
     string_types = (str, unicode)
 
 
-BYPASS = lambda value: value
+def BYPASS(value):
+    return value
 
 
 def _get_context(func, kwargs):
@@ -191,7 +192,7 @@ class Attr(object):
 
         try:
             value = self.accessor.get(compartment)
-        except KeyError:
+        except (KeyError, AttributeError):
             if hasattr(self, "default"):
                 value = self.default
             else:
@@ -387,7 +388,7 @@ class _Schema(types.Type):
             except exceptions.ValidationError as e:
                 e.attr = attr.name
                 errors.append(e)
-            except KeyError:
+            except (KeyError, AttributeError):
                 if attr.required:
                     e = exceptions.ValidationError("Missing attribute.", attr.name)
                     e.attr = attr.name

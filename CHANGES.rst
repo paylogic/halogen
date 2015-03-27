@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.4
+-----
+
+* Correctly render and document deserialization errors (bubenkoff)
+
 1.0.3
 -----
 

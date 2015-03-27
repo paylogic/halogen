@@ -733,7 +733,7 @@ Example:
         hello = halogen.Attr()
 
     result = Hello.deserialize({"hello": "Hello World"})
-    print result
+    print(result)
 
 Result:
 
@@ -764,7 +764,7 @@ Example:
 
 
     Hello.deserialize({"hello": "Hello World"}, hello_message)
-    print hello_message.hello
+    print(hello_message.hello)
 
 Result:
 
@@ -822,14 +822,131 @@ Example:
 
 
     product = ProductSchema.deserialize({"title": "Pencil", "price": {"currency": "EUR", "amount": 0.30}})
-    print product
+    print(product)
 
 
-Resource:
+Result:
 
 .. code-block:: python
 
     {"price": Amount: EUR 0.3, "title": "Pencil"}
+
+
+Deserialization validation errors
+---------------------------------
+
+On deserialization failure, halogen raises special exception (``halogen.exceptions.ValidationError``).
+That exception class has ``__unicode__`` method which  renders human readable error result so user can easily track
+down the problem with his input.
+
+
+Example:
+
+.. code-block:: python
+
+    import halogen
+
+    class Hello(halogen.Schema):
+        hello = halogen.Attr()
+
+    try:
+        result = Hello.deserialize({})
+    except halogen.exceptions.ValidationError as exc:
+        print(exc)
+
+Result:
+
+.. code-block:: python
+
+    {
+        "errors": [
+            {
+                "errors": [
+                        {
+                            "type": "str",
+                            "error": "Missing attribute."
+                        }
+                    ],
+                "attr": "hello"
+            }
+        ],
+        "attr": "<root>"
+    }
+
+
+In case when you have nested schemas, and use ``List``, halogen also adds the index (counting from 0) in the list
+so you see where exactly the validation error happened.
+
+
+Example:
+
+.. code-block:: python
+
+    import halogen
+
+    class Product(halogen.Schema):
+
+        """A product has a name and quantity."""
+
+        name = halogen.Attr()
+        quantity = halogen.Attr()
+
+
+    class NestedSchema(halogen.Schema):
+
+        """An example nested schema."""
+
+        products = halogen.Attr(
+            halogen.types.List(
+                Product,
+            ),
+            default=[],
+        )
+
+    try:
+        result = NestedSchema.deserialize({
+            "products": [
+                {
+                    "name": "name",
+                    "quantity": 1
+                },
+                {
+                    "name": "name",
+                }
+
+            ]
+        })
+    except halogen.exceptions.ValidationError as exc:
+        print(exc)
+
+Result:
+
+.. code-block:: python
+
+    {
+        "errors": [
+            {
+                "errors": [
+                    {
+                        "index": 1,
+                        "errors": [
+                            {
+                                "errors": [
+                                    {
+                                        "type": "str",
+                                        "error": "Missing attribute."
+                                    }
+                                ],
+                                "attr": "quantity"
+                            }
+                        ]
+                    }
+                ],
+                "attr": "products"
+            }
+        ],
+        "attr": "<root>"
+    }
 
 
 Contact
