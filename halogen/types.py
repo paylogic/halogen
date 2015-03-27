@@ -66,11 +66,10 @@ class List(Type):
 
         for index, val in enumerate(value):
             try:
-                item = self.item_type.deserialize(val, **kwargs)
+                result.append(self.item_type.deserialize(val, **kwargs))
             except ValidationError as exc:
                 exc.index = index
                 errors.append(exc)
-            result.append(item)
         if errors:
             raise ValidationError(errors)
         return result

@@ -200,10 +200,10 @@ def test_nested():
             "products": [
                 {
                     "name": "Some name",
-                    "quantity": 1
                 },
                 {
                     "name": "Some name",
+                    "quantity": 1
                 },
             ]
         }, {
@@ -211,7 +211,7 @@ def test_nested():
                 {
                     "errors": [
                         {
-                            "index": 1,
+                            "index": 0,
                             "errors": [
                                 {
                                     "errors": [
