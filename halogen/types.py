@@ -1,4 +1,5 @@
 """Halogen basic types."""
+from .exceptions import ValidationError
 
 
 class Type(object):
@@ -31,7 +32,7 @@ class Type(object):
 
     @staticmethod
     def is_type(value):
-        """Is value an instance or subclass of the class Type."""
+        """Determine if value is an instance or subclass of the class Type."""
         if isinstance(value, type):
             return issubclass(value, Type)
         return isinstance(value, Type)
@@ -57,10 +58,19 @@ class List(Type):
 
     def deserialize(self, value, **kwargs):
         """Deserialize every item of the list."""
-
         if self.allow_scalar and not isinstance(value, (list, tuple)):
             value = [value]
-
         value = super(List, self).deserialize(value)
+        result = []
+        errors = []
 
-        return [self.item_type.deserialize(val, **kwargs) for val in value]
+        for index, val in enumerate(value):
+            try:
+                item = self.item_type.deserialize(val, **kwargs)
+            except ValidationError as exc:
+                exc.index = index
+                errors.append(exc)
+            result.append(item)
+        if errors:
+            raise ValidationError(errors)
+        return result

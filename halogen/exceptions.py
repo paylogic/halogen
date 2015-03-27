@@ -7,8 +7,9 @@ class ValidationError(Exception):
 
     """Validation failed."""
 
-    def __init__(self, errors, attr=None):
+    def __init__(self, errors, attr=None, index=None):
         self.attr = attr
+        self.index = index
         if isinstance(errors, list):
             self.errors = errors
         else:
@@ -27,13 +28,17 @@ class ValidationError(Exception):
             except AttributeError:
                 return {
                     "type": e.__class__.__name__,
-                    "error": str(e)
+                    "error": str(e),
                 }
 
-        return {
-            "attr": self.attr if self.attr is not None else "<root>",
+        result = {
             "errors": [exception_to_dict(e) for e in self.errors]
         }
+        if self.index is not None:
+            result["index"] = self.index
+        else:
+            result["attr"] = self.attr if self.attr is not None else "<root>"
+        return result
 
     def __str__(self):
         return json.dumps(self.to_dict())
