@@ -1,10 +1,11 @@
 Changelog
 =========
 
-1.0.7
+1.0.8
 -----
 
-* Correctly handler and document ``required`` and ``default`` (bubenkoff)
+* Correctly handle and document ``required`` and ``default`` (bubenkoff)
+* Properly get validator's comparison values (lazy and constant) (bubenkoff)
 * Increase test coverage (bubenkoff)
 
 1.0.6

@@ -1,6 +1,6 @@
 """halogen public API."""
 
-__version__ = '1.0.7'
+__version__ = '1.0.8'
 
 try:
     from halogen.schema import Schema, Attr, Link, Curie, Embedded, Accessor

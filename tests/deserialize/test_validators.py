@@ -5,12 +5,18 @@ import pytest
 import halogen
 
 
-def test_less_than():
+@pytest.fixture(params=[False, True])
+def lazy(request):
+    return request.param
+
+
+def test_less_than(lazy):
     """Test less than validator."""
     class Schema(halogen.Schema):
 
-        attr = halogen.Attr(halogen.types.Type(validators=[halogen.validators.LessThanEqual(
-            1, value_err="{0} is bigger than {1}")]))
+        attr = halogen.Attr(halogen.types.Type(validators=[
+            halogen.validators.LessThanEqual((lambda: 1) if lazy else 1, value_err="{0} is bigger than {1}"),
+        ]))
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({'attr': 2})
@@ -19,12 +25,12 @@ def test_less_than():
     assert Schema.deserialize({'attr': 1}) == {'attr': 1}
 
 
-def test_greated_than():
+def test_greated_than(lazy):
     """Test greater than validator."""
     class Schema(halogen.Schema):
 
         attr = halogen.Attr(halogen.types.Type(validators=[halogen.validators.GreatThanEqual(
-            1, value_err="{0} is smaller than {1}")]))
+            (lambda: 1) if lazy else 1, value_err="{0} is smaller than {1}")]))
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({'attr': 0})
@@ -32,12 +38,15 @@ def test_greated_than():
     assert Schema.deserialize({'attr': 1}) == {'attr': 1}
 
 
-def test_length():
+def test_length(lazy):
     """Test length validator."""
     class Schema(halogen.Schema):
 
         attr = halogen.Attr(halogen.types.Type(validators=[halogen.validators.Length(
-            1, 2, min_err="Length is less than {0}", max_err="Length is greater than {0}")]))
+            (lambda: 1) if lazy else 1,
+            (lambda: 2) if lazy else 2,
+            min_err="Length is less than {0}",
+            max_err="Length is greater than {0}")]))
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({'attr': []})
@@ -52,7 +61,7 @@ def test_length():
     assert err.value.errors[0].errors == ['Length is greater than 2']
 
 
-def test_range():
+def test_range(lazy):
     """Test range validator."""
     class Schema(halogen.Schema):
 
