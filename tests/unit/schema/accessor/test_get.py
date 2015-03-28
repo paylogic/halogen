@@ -82,7 +82,7 @@ def test_get_dict_string(basic_dict_value, basic_dict):
 @pytest.mark.parametrize(
     "basic_object_value",
     [
-        {"key": {"key": "value"}},
+        {"key": {"key": lambda: "value"}},
         {"key": Obj(key="value")},
         Obj(key={"key": "value"}),
         Obj(key=Obj(key="value")),

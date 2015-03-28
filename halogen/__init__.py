@@ -1,6 +1,6 @@
 """halogen public API."""
 
-__version__ = '1.0.6'
+__version__ = '1.0.7'
 
 try:
     from halogen.schema import Schema, Attr, Link, Curie, Embedded, Accessor
@@ -19,6 +19,6 @@ try:
         "types",
         "validators",
     ]
-except ImportError:
+except ImportError:  # pragma: no cover
     # avoid import errors when only __version__ is needed (for setup.py)
     pass

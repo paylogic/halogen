@@ -375,13 +375,31 @@ Result:
         "title": "Harry Potter and the Philosopher's Stone"
     }
 
+Attr(Type(validators=[validator]))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Type gets optional ``validators`` parameter, which is a list of ``halogen.validators.Validator`` objects whose single
+interface method ``validate`` will be called for the given value during the deserialization. If the value is not valid,
+``halogen.exceptions.ValidationError`` should be raised.
+Halogen provides basic validators, for example ``halogen.validators.Range`` to validate that the values is in certain
+range.
+
+
+Attr(default=value)
+~~~~~~~~~~~~~~~~~~~
+
+If an attribute cannot be taken, provided ``default`` value will be used; if ``default`` value is
+a callable, it will be called to get the default value.
+
 
 Attr(required=False)
 ~~~~~~~~~~~~~~~~~~~~
 
-By default, attributes are required, so when an attribute can not be taken during the serialization, an exception will
-be raised (``AttributeError`` or ``KeyError``, depending on the input).
+By default, attributes are required, so when an attribute can not be taken during the serialization and ``default``
+is not provided, an exception will be raised (``AttributeError`` or ``KeyError``, depending on the input).
 It's possible to relax this restriction by passing ``required=False`` to the attribute constructor.
+For deserialization, the same logic applies, but the exception type will be ``halogen.exceptions.ValidationError``
+for human readability (see Deserialization_).
 
 
 Type
@@ -595,7 +613,7 @@ Example:
     em = halogen.Curie(
         name="em",
         href="https://docs.event-manager.com/{rel}.html",
-        templated=true,
+        templated=True,
         type="text/html"
     )
 

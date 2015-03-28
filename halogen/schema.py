@@ -5,7 +5,7 @@ import inspect
 
 try:
     from collections import OrderedDict
-except ImportError:
+except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict  # noqa
 
 from halogen import types
@@ -13,9 +13,9 @@ from halogen import exceptions
 
 PY2 = sys.version_info[0] == 2
 
-if not PY2:
+if not PY2:  # pragma: no cover
     string_types = (str,)
-else:
+else:  # pragma: no cover
     string_types = (str, unicode)
 
 
@@ -95,7 +95,7 @@ class Accessor(object):
 
     def __repr__(self):
         """Accessor representation."""
-        return "<{0} getter='{1}', setter='{1}'>".format(
+        return "<{0} getter='{1}', setter='{2}'>".format(
             self.__class__.__name__,
             self.getter,
             self.setter,
@@ -193,10 +193,9 @@ class Attr(object):
         try:
             value = self.accessor.get(compartment)
         except (KeyError, AttributeError):
-            if hasattr(self, "default"):
-                value = self.default
-            else:
+            if not hasattr(self, "default") and self.required:
                 raise
+            return self.default() if callable(self.default) else self.default
         return self.attr_type.deserialize(value)
 
     def __repr__(self):
@@ -375,6 +374,7 @@ class _Schema(types.Type):
 
         :returns: Dict of deserialized value for attributes. Where key is name of schema's attribute and value is
         deserialized value from value dict.
+        :raises: ValidationError.
         """
         errors = []
         result = {}

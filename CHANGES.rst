@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.0.7
+-----
+
+* Correctly handler and document ``required`` and ``default`` (bubenkoff)
+* Increase test coverage (bubenkoff)
+
 1.0.6
 -----
 

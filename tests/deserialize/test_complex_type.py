@@ -1,5 +1,5 @@
 """Test functionality of Halogen when using a complex type."""
-
+import json
 import copy
 from decimal import Decimal, InvalidOperation
 
@@ -46,6 +46,7 @@ class NestedSchema(halogen.Schema):
 
     """An example nested schema, with a person, an is_friend attribute, and a price."""
 
+    self = halogen.Link(attr='/some/link')
     person = halogen.Attr(Person)
     is_friend = halogen.Attr()
     price = halogen.Attr(Amount)
@@ -72,13 +73,17 @@ def test_nested():
         },
         "is_friend": True,
         "price": {"currency": "EUR", "amount": "13.37"},
-        "products": []
+        "products": {'name': 'product', 'quantity': 1}
     }
 
     expected = copy.deepcopy(nested_data)
     expected["price"]["amount"] = Decimal(expected["price"]["amount"])
+    expected["products"] = [expected["products"]]
     deserialized = NestedSchema.deserialize(nested_data)
     assert deserialized == expected
+    output = {}
+    NestedSchema.deserialize(nested_data, output=output)
+    assert output == expected
 
 
 @pytest.mark.parametrize(["data", "errors"], [
@@ -211,7 +216,6 @@ def test_nested():
                 {
                     "errors": [
                         {
-                            "index": 0,
                             "errors": [
                                 {
                                     "errors": [
@@ -222,7 +226,8 @@ def test_nested():
                                     ],
                                     "attr": "quantity"
                                 }
-                            ]
+                            ],
+                            "index": 0,
                         }
                     ],
                     "attr": "products"
@@ -237,3 +242,4 @@ def test_missing_attribute(data, errors):
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         NestedSchema.deserialize(data)
     assert err.value.to_dict() == errors
+    assert str(err.value) == json.dumps(errors)
