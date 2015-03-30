@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-"""Setup functionality for the Halogen library."""
+"""Setuptools entry point."""
 import codecs
 import sys
 from os.path import abspath, dirname, join
@@ -9,11 +8,16 @@ from setuptools.command.test import test as TestCommand
 
 import halogen
 
+install_requires = [
+    'isodate',
+    'pytz',
+    'six',
+]
+
 try:
     from collections import OrderedDict  # noqa
-    install_requires = []
-except ImportError:
-    install_requires = ['ordereddict']
+except ImportError:  # pragma: no cover
+    install_requires.append('ordereddict')
 
 
 class ToxTestCommand(TestCommand):
@@ -35,7 +39,7 @@ class ToxTestCommand(TestCommand):
 
     def run_tests(self):
         """Invoke the test runner (tox)."""
-        #import here, cause outside the eggs aren't loaded
+        # import here, cause outside the eggs aren't loaded
         import tox
         import shlex
         errno = tox.cmdline(args=shlex.split(self.tox_args))

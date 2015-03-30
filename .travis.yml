@@ -1,13 +1,14 @@
 language: python
+env:
+    - TESTENV=py26
+    - TESTENV=py27
+    - TESTENV=py34
+    - TESTENV=coveralls
 # command to install dependencies
 install:
-  - pip install python-coveralls virtualenv
+  - pip install tox
 # # command to run tests
-script: python setup.py test
-after_success:
-  - pip install -r requirements-testing.txt -e .
-  - py.test --cov=halogen --cov-report=term-missing tests
-  - coveralls
+script: tox -e $TESTENV
 notifications:
     email:
         - opensource-tests@paylogic.com
