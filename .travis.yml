@@ -1,13 +1,16 @@
+sudo: false
 language: python
-# command to install dependencies
+env:
+  matrix:
+  - TESTENV=py26
+  - TESTENV=py27
+  - TESTENV=py34
+  - TESTENV=coveralls
+  global:
+    secure: QdD3CypzsV9tDvnhDkObwRt5sWcsnRVa4sBMEzefRwUpAQmMZqcVRA5zZqI9M2qShMX2+EzG76ROKj+IuDrH5sycHRMsByx36qXWC6yTeFGO/qcvbamclP6tr0+/ld+3pSi2rlpVrc551/tMnhzymKuEaPn3bZJz0dx39ryjAGs=
 install:
-  - pip install python-coveralls virtualenv
-# # command to run tests
-script: python setup.py test
-after_success:
-  - pip install -r requirements-testing.txt -e .
-  - py.test --cov=halogen --cov-report=term-missing tests
-  - coveralls
+- pip install tox
+script: tox -e $TESTENV
 notifications:
-    email:
-        - opensource-tests@paylogic.com
+  email:
+  - opensource-tests@paylogic.com

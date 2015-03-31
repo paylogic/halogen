@@ -241,5 +241,6 @@ def test_missing_attribute(data, errors):
     """Test if an exception is raised when an attribute is missing."""
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         NestedSchema.deserialize(data)
-    assert err.value.to_dict() == errors
-    assert str(err.value) == json.dumps(errors)
+    err_dict = err.value.to_dict()
+    assert err_dict == errors
+    assert str(err.value) == json.dumps(err_dict)

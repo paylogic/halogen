@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.1.0
+-----
+
+* Add common-use types (bubenkoff)
+
 1.0.8
 -----
 
