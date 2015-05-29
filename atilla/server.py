@@ -83,6 +83,7 @@ def create_app(name, mode, app_class=None, config=None, settings_module=None):
     app.config.setdefault('PORT', '8080')
     app.config.setdefault('DEBUG', False)
     app.config.setdefault('LANGUAGES', ['en'])
+    app.config.setdefault('LOG_ADDRESS', '/var/run/syslog' if sys.platform == 'darwin' else '/dev/log')
 
     # URL converters
     app.url_map.converters['uid'] = validators.UidValidator
@@ -114,10 +115,9 @@ def create_app(name, mode, app_class=None, config=None, settings_module=None):
             'CACHE_MEMCACHED_SERVERS': app.config['MEMCACHED_SERVERS']
         })
 
-    address = '/var/run/syslog' if sys.platform == 'darwin' else '/dev/log'
     syslog = logging.handlers.SysLogHandler(
         facility=app.config['LOG_FACILITY'],
-        address=address
+        address=app.config['LOG_ADDRESS'],
     )
     syslog.setLevel(logging.DEBUG)
 

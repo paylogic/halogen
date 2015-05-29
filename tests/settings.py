@@ -22,3 +22,4 @@ class TestConfig(object):
     MEMCACHED_COUNTER_TIME = 0
     TRANSACTION_COMMIT_STATUS_CODES = [200, 201]
     OBJECTS_PER_PAGE = 2
+    LOG_ADDRESS = ('localhost', logging.handlers.SYSLOG_UDP_PORT)
