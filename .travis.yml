@@ -10,6 +10,9 @@ install:
   - pip install tox
 # # command to run tests
 script: tox -e $TESTENV
+branches:
+  except:
+  - /^\d/
 notifications:
     email:
         - opensource-tests@paylogic.com
