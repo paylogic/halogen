@@ -1,12 +1,9 @@
 """Helperfunctions for pagination."""
 import collections
 import math
-import httplib
 
-try:
-    from urllib import parse as urlparse
-except ImportError:  # pragma: no cover
-    import urlparse
+from six.moves import http_client
+from six.moves.urllib import parse as urlparse
 from flask import url_for, current_app
 
 from atilla import exceptions
@@ -30,14 +27,14 @@ def parse_current_page(page):
         raise exceptions.ApiException(
             message=message,
             description=description,
-            status_code=httplib.BAD_REQUEST,
+            status_code=http_client.BAD_REQUEST,
         )
 
     if page <= 0:
         message = description = 'The supplied page number is less than 1.'
         raise exceptions.ApiException(
             message=message,
-            status_code=httplib.BAD_REQUEST,
+            status_code=http_client.BAD_REQUEST,
             description=description,
         )
 
