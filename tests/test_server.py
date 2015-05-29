@@ -19,6 +19,8 @@ class TestConfig(object):
 
     """Test application config."""
 
+    LOG_ADDRESS = ('localhost', logging.handlers.SYSLOG_UDP_PORT)
+
 
 def test_create_app_config():
     """Test create app config."""

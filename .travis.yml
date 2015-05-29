@@ -1,18 +1,18 @@
 sudo: false
 language: python
 env:
-    - TESTENV=py26
-    - TESTENV=py27
-    - TESTENV=py34
-    - TESTENV=coveralls
-# command to install dependencies
+- TESTENV=py26
+- TESTENV=py27
+- TESTENV=py34
+- TESTENV=coveralls
 install:
-  - pip install tox
-# # command to run tests
+- pip install tox
 script: tox -e $TESTENV
 branches:
   except:
   - /^\d/
 notifications:
-    email:
-        - opensource-tests@paylogic.com
+  email:
+  - opensource-tests@paylogic.com
+  slack:
+    secure: Uwc6hfjc6ce6Ti6GmbDHW6Y7FUKAQzLpQD1BfaS+ZjnxngggmvZmh6p8aTFae7xFwGYHk9bYBOpInoyvxcvgLQjIRPIZ8NyNVOBP2kNcvUVEO42RCDMyEFN1V3buHW57sCA5ANwQYNyxmRf6S2BlIMpj4kR4eajzWM+y2MqfFHLi4ZH+Co0fiSnM1FfDnHKDt+K6Gpfl4vemlX35V0Uijavgafb2l2arWc2nc4tXT0bKcIEcW7r9cNEbOR9mFIV/PLiTpmfifwd6hsphw6nEOKD0tEk9TQkbATda7lazZWPHhEjViXFmfR5fa+vGBmCPvPG3s3H/2G/QqZQR/X5kyaTrchTQdPUXRB04nybmBkbieQHEq/EsFytDGYtK/piY2ErEzVBSv0BWmvda005XE5tDdvewfeihoZedG4rPMPtTfVRXFCj2SMG3eeaQ2RHkG2wkV8STSwMR51St3rkbv+1G9o7CxAEEZQDFqMjW/RUMySxm9sXoiD20A9jYTl4rh+oGUbWPJebxRPCly2b1fJnjxV1qmuKkK8Ll/KesWEQH7OriTi9cKJNxlkdnMd9QhbFj0LiHtjE+UHKub8x1mFoqyqkQ2K9oWY1p/fbpbKiR0UQ6yErczfTuUMZnLLi0Nf7hEFBE2wzIs32OAheAodLyV2E6MwaXoppSsn12z8A=
