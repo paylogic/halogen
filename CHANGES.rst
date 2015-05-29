@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.2.1
+-----
+
+* python3 support fixes (bubenkoff)
+
 1.2.0
 -----
 
