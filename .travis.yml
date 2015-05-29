@@ -1,10 +1,13 @@
 sudo: false
 language: python
 env:
-- TESTENV=py26
-- TESTENV=py27
-- TESTENV=py34
-- TESTENV=coveralls
+  matrix:
+  - TESTENV=py26
+  - TESTENV=py27
+  - TESTENV=py34
+  - TESTENV=coveralls
+  global:
+    secure: e6MspASLp7ziqDQZMwcUhvc4cGv8MRdg90klOQWwvZmos3T3ilvRtbmrqFqoJUwCWKyqAmIc/zZJOCpaJXakMI60VvmNFN/KfGxQDGOtT9E/c2O7iiyYiw8hxjVgdRrERZurkJQJlOF8xQgB8MeLnj9NjGdqL5vxw/lx97jbRzSHVwB844QXZ7Sg2sB6w+M+vytaEg9iC+m6Z3aqlwdKvdu5Or28LsqXRDBTRIU5ClB6KxRladaoaPjeSJCnkgrhrTzb4v0sLwViEiVB0DlXljIgtMNJD8dTdsTlqYeTKc/PkKAGvnZLaJNYjmng1HEqLm3wp/ZlS9J69GqNmkrtBXy1V4FUWTJYR/cMIw/mjd+p8k/B4sBYACl4YOlIDMM+K/trcmzzThEAG3h+2as1ZhGhUH9piu5FL+gqzopSlm709ZbYqK8gG83wljqELN+NS5HNpGoRGzdK8HYxUtd65w9nBTA4dZ0MiRd3Wre5xjZp4XTz7w0P6X5sAqsXt73ynKSdARKSDbKDx3r5esHAE3a0bjnUR7Nmq4aques2SKdKNZf9pFFeeghAL8hdDPYWgfVIE1AJQLTopmRD2VUwKwrWetuSblU5DYydr7k0y3HNxDAehvD+DC227TluivL/JEHwduMkbhDX7v6UhOE03dUbI61yyaF1qhHHaJ3OHVE=
 install:
 - pip install tox
 script: tox -e $TESTENV
