@@ -1,0 +1,15 @@
+sudo: false
+language: python
+env:
+    - TESTENV=py26
+    - TESTENV=py27
+    - TESTENV=py34
+    - TESTENV=coveralls
+# command to install dependencies
+install:
+  - pip install tox
+# # command to run tests
+script: tox -e $TESTENV
+notifications:
+    email:
+        - opensource-tests@paylogic.com
