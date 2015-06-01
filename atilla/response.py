@@ -118,11 +118,11 @@ def vnd_error_response(exception, status_code=None, headers=None):
     all_headers = set_basic_headers(request, mimetype='application/hal+json')
     if headers:
         all_headers.update(headers)
-
-    try:
-        exception.message = exception.args[0]
-    except IndexError:
-        exception.message = ''
+    if not hasattr(exception, 'message'):
+        try:
+            exception.message = exception.args[0]
+        except IndexError:
+            exception.message = ''
     body = VNDError.serialize(exception)
 
     if status_code == httplib.INTERNAL_SERVER_ERROR or current_app.config['SENTRY_CAPTURE_USER_ERRORS']:

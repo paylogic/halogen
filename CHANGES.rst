@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.2.2
+-----
+
+* correctly handle exception message (bubenkoff)
+
 1.2.1
 -----
 
