@@ -49,10 +49,10 @@ def test_constant_href():
 
         """A test schema."""
 
-        warehouse = halogen.Link("/test/123")
+        warehouse = halogen.Link("/test/123", deprecation="http://foo.bar")
 
     assert Schema.serialize({}) == {
         "_links": {
-            "warehouse": {"href": "/test/123"},
+            "warehouse": {"deprecation": "http://foo.bar", "href": "/test/123"},
         }
     }

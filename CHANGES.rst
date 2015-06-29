@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.1.1
+-----
+
+* Deprecation attribute is added to Link (olegpidsadnyi)
+
+
 1.1.0
 -----
 

@@ -210,7 +210,8 @@ class Link(Attr):
 
     """Link attribute of a schema."""
 
-    def __init__(self, attr_type=None, attr=None, key=None, required=True, curie=None, templated=None, type=None):
+    def __init__(self, attr_type=None, attr=None, key=None, required=True,
+                 curie=None, templated=None, type=None, deprecation=None):
         """Link constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -219,6 +220,7 @@ class Link(Attr):
         :param required: Is this link required to be present.
         :param curie: Link namespace prefix (e.g. "<prefix>:<name>") or Curie object.
         :param templated: Is this link templated.
+        :param deprecation: Link deprecation URL.
         :param type: Its value is a string used as a hint to indicate the media type expected when dereferencing
                            the target resource.
         """
@@ -230,6 +232,7 @@ class Link(Attr):
             attrs = {
                 'templated': templated,
                 'type': type,
+                'deprecation': deprecation,
             }
 
             class LinkSchema(Schema):
@@ -240,6 +243,9 @@ class Link(Attr):
 
                 if attrs['type'] is not None:
                     type = Attr(attr=lambda value: type)
+
+                if attrs['deprecation'] is not None:
+                    deprecation = Attr(attr=lambda value: deprecation)
 
             attr_type = LinkSchema
 
