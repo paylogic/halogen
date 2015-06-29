@@ -528,6 +528,24 @@ Callable variant
 
             help = halogen.Link(attr=lambda: current_app.config['DOC_URL'])
 
+deprecation
+-----------
+
+Links can be deprecated by specifying the deprecation URL attribute which points to the document
+describing the deprecation.
+
+
+    .. code-block:: python
+
+        import halogen
+
+        class EventSchema(halogen.Schema):
+
+            artist = halogen.Link(
+                attr="/artists/some-artist",
+                deprecation="http://docs.api.com/deprecations#artist",
+            )
+
 
 CURIE
 ~~~~~
