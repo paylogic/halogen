@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.2.3
+-----
+
+* handle unauthorized requests correctly (bubenkoff)
+
 1.2.2
 -----
 

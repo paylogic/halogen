@@ -51,7 +51,7 @@ class Request(RequestBase):
     @cached_property
     def api_key(self):
         """Get the api key."""
-        return self.authorization.get('username')
+        return self.authorization.get('username') if self.authorization else None
 
     @cached_property
     def parsed_data(self):
