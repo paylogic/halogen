@@ -162,7 +162,8 @@ def set_basic_headers(request, mimetype=None):
     if mimetype:
         headers['Content-Type'] = mimetype
 
-    url_adapter = current_app.url_map.bind(server_name=current_app.config['SERVER_NAME'])
+    url_adapter = current_app.url_map.bind(
+        server_name=current_app.config['SERVER_NAME'] or request.environ['REMOTE_ADDR'])
     methods = url_adapter.allowed_methods(request.path)
 
     headers['Access-Control-Allow-Methods'] = methods

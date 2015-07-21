@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.2.4
+-----
+
+* accept remote address as host name if not passed by config (bubenkoff)
+
 1.2.3
 -----
 
