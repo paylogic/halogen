@@ -130,7 +130,7 @@ class String(Type):
         return ""
 
     def deserialize(self, value, **kwargs):
-        if value:
+        if value is not None:
             return super(String, self).deserialize(value)
         return ""
 
@@ -144,11 +144,10 @@ class Int(Type):
 
     def deserialize(self, value, **kwargs):
         try:
-            value = super(Int, self).deserialize(int(value) if value else None)
+            value = int(value) if value is not None else None
         except ValueError:
             raise ValueError("'{val}' is not an integer".format(val=value))
-
-        return value
+        return super(Int, self).deserialize(value, **kwargs)
 
 
 class Boolean(Type):

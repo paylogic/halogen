@@ -1,11 +1,15 @@
 Changelog
 =========
 
+1.1.2
+-----
+
+* Correct deserialization for String and Int types (bubenkoff)
+
 1.1.1
 -----
 
 * Deprecation attribute is added to Link (olegpidsadnyi)
-
 
 1.1.0
 -----
