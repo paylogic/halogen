@@ -20,6 +20,7 @@ else:  # pragma: no cover
 
 
 def BYPASS(value):
+    """Bypass getter."""
     return value
 
 
@@ -346,19 +347,19 @@ class _Schema(types.Type):
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
         schema = type("Schema", (cls, ), {"__doc__": cls.__doc__})
-        schema.__class_attrs__ = []
-        schema.__attrs__ = []
+        schema.__class_attrs__ = OrderedDict()
+        schema.__attrs__ = OrderedDict()
         for name, attr in kwargs.items():
             if not hasattr(attr, "name"):
                 attr.name = name
-            schema.__class_attrs__.append(attr)
-            schema.__attrs__.append(attr)
+            schema.__class_attrs__[attr.name] = attr
+            schema.__attrs__[attr.name] = attr
         return schema
 
     @classmethod
     def serialize(cls, value, **kwargs):
         result = OrderedDict()
-        for attr in cls.__attrs__:
+        for attr in cls.__attrs__.values():
             compartment = result
             if attr.compartment is not None:
                 compartment = result.setdefault(attr.compartment, OrderedDict())
@@ -384,7 +385,7 @@ class _Schema(types.Type):
         """
         errors = []
         result = {}
-        for attr in cls.__attrs__:
+        for attr in cls.__attrs__.values():
             try:
                 result[attr.name] = attr.deserialize(value)
             except NotImplementedError:
@@ -404,7 +405,7 @@ class _Schema(types.Type):
 
         if output is None:
             return result
-        for attr in cls.__attrs__:
+        for attr in cls.__attrs__.values():
             if attr.name in result:
                 attr.accessor.set(output, result[attr.name])
 
@@ -415,7 +416,7 @@ class _SchemaType(type):
 
     def __init__(cls, name, bases, clsattrs):
         """Create a new _SchemaType."""
-        cls.__class_attrs__ = []
+        cls.__class_attrs__ = OrderedDict()
         curies = set([])
 
         attrs = [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)]
@@ -424,7 +425,7 @@ class _SchemaType(type):
         # Collect the attributes and set their names.
         for name, attr in attrs:
             delattr(cls, name)
-            cls.__class_attrs__.append(attr)
+            cls.__class_attrs__[name] = attr
             if not hasattr(attr, "name"):
                 attr.name = name
 
@@ -448,11 +449,11 @@ class _SchemaType(type):
             )
             link.name = "curies"
 
-            cls.__class_attrs__.append(link)
+            cls.__class_attrs__[link.name] = link
 
-        cls.__attrs__ = []
+        cls.__attrs__ = OrderedDict()
         for base in reversed(cls.__mro__):
-            cls.__attrs__.extend(getattr(base, "__class_attrs__", []))
+            cls.__attrs__.update(getattr(base, "__class_attrs__", OrderedDict()))
 
 
 Schema = _SchemaType("Schema", (_Schema, ), {"__doc__": _Schema.__doc__})

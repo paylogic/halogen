@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.1.3
+-----
+
+* Correctly handle schema class derivation (bubenkoff)
+
 1.1.2
 -----
 
