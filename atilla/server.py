@@ -95,7 +95,7 @@ def create_app(name, mode, app_class=None, config=None, settings_module=None):
             u'{0}.{1}'.format(settings_module, config_name)
         )
         if config and os.path.exists(config):
-            app.config.from_file(config)
+            app.config.from_pyfile(config)
     except ImportError:
             raise RuntimeError(u"Can't find {0} in {1}".format(config_name, settings_module))
 
