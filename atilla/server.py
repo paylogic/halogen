@@ -94,7 +94,7 @@ def create_app(name, mode, app_class=None, config=None, settings_module=None):
         app.config.from_object(
             u'{0}.{1}'.format(settings_module, config_name)
         )
-        if config and os.path.exist(config):
+        if config and os.path.exists(config):
             app.config.from_file(config)
     except ImportError:
             raise RuntimeError(u"Can't find {0} in {1}".format(config_name, settings_module))
