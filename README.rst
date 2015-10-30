@@ -3,15 +3,12 @@ halogen
 
 Python HAL generation/parsing library.
 
-.. image:: https://api.travis-ci.org/paylogic/halogen.png
-   :target: https://travis-ci.org/paylogic/halogen
-
-.. image:: https://pypip.in/v/halogen/badge.png
-   :target: https://crate.io/packages/halogen/
-
-.. image:: https://coveralls.io/repos/paylogic/halogen/badge.png?branch=master
+.. image:: http://img.shields.io/pypi/v/halogen.svg
+   :target: https://pypi.python.org/pypi/halogen
+.. image:: http://img.shields.io/coveralls/paylogic/halogen/master.svg
    :target: https://coveralls.io/r/paylogic/halogen
-
+.. image:: https://travis-ci.org/paylogic/halogen.svg?branch=master
+    :target: https://travis-ci.org/paylogic/halogen
 .. image:: https://readthedocs.org/projects/halogen/badge/?version=latest
     :alt: Documentation Status
     :scale: 100%
