@@ -5,15 +5,12 @@ Atilla (the API Utilities Library) contains a number of useful functions that ar
 HTTP API applications. This includes types, validators, functions for creating applications,
 etc. This library will make setting up new projects a lot faster.
 
-.. image:: https://api.travis-ci.org/paylogic/atilla.png
-   :target: https://travis-ci.org/paylogic/atilla
-
-.. image:: https://pypip.in/v/atilla/badge.png
-   :target: https://crate.io/packages/atilla/
-
-.. image:: https://coveralls.io/repos/paylogic/atilla/badge.png?branch=master
+.. image:: http://img.shields.io/pypi/v/atilla.svg
+   :target: https://pypi.python.org/pypi/atilla
+.. image:: http://img.shields.io/coveralls/paylogic/atilla/master.svg
    :target: https://coveralls.io/r/paylogic/atilla
-
+.. image:: https://travis-ci.org/paylogic/atilla.svg?branch=master
+    :target: https://travis-ci.org/paylogic/atilla
 .. image:: https://readthedocs.org/projects/atilla/badge/?version=latest
     :alt: Documentation Status
     :scale: 100%
