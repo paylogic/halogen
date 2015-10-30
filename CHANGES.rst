@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.2.1
+-----
+
+* Use native datetime.isoformat for datetime serialization (bubenkoff)
+
 1.1.3
 -----
 

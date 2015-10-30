@@ -30,10 +30,18 @@ def test_list():
 def test_isodatetime():
     """Test iso datetime."""
     type_ = types.ISOUTCDateTime()
-    value = datetime.datetime.now(pytz.timezone("CET"))
-    serialized = value.astimezone(pytz.UTC).strftime("%Y-%m-%dT%H:%MZ")
+    value = datetime.datetime.now(pytz.timezone("CET")).astimezone(pytz.UTC)
+    serialized = value.strftime("%Y-%m-%dT%H:%M:%SZ")
     assert type_.serialize(value) == serialized
-    assert type_.deserialize(serialized) == value.replace(second=0, microsecond=0)
+    assert type_.deserialize(serialized) == value.replace(microsecond=0)
+
+
+def test_isodatetime_bc():
+    """Test iso datetime with year before 1900."""
+    type_ = types.ISOUTCDateTime()
+    value = datetime.datetime(1800, 1, 1, tzinfo=pytz.timezone("CET"))
+    assert type_.serialize(value) == '1799-12-31T23:00:00Z'
+    assert type_.deserialize('1799-12-31T23:00:00Z') == value.replace(microsecond=0)
 
 
 def test_isodatetime_wrong():
@@ -47,10 +55,10 @@ def test_isodatetime_wrong():
 def test_isodate():
     """Test iso datetime."""
     type_ = types.ISOUTCDate()
-    value = datetime.datetime.now(pytz.timezone("CET"))
-    serialized = value.astimezone(pytz.UTC).strftime("%Y-%m-%d")
+    value = datetime.datetime.now(pytz.timezone("CET")).date()
+    serialized = value.strftime("%Y-%m-%d")
     assert type_.serialize(value) == serialized
-    assert type_.deserialize(serialized) == value.date()
+    assert type_.deserialize(serialized) == value
 
 
 def test_string():

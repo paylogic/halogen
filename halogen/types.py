@@ -88,17 +88,16 @@ class ISOUTCDateTime(Type):
 
     type = "datetime"
     message = u"'{val}' is not a valid ISO-8601 datetime"
-    format = "%Y-%m-%dT%H:%MZ"
 
     def format_as_utc(self, value):
         """Format UTC times."""
         if isinstance(value, datetime.datetime):
             if value.tzinfo is not None:
                 value = value.astimezone(pytz.UTC)
-        return value.strftime(self.format)
+            value = value.replace(microsecond=0)
+        return value.isoformat().replace('+00:00', 'Z')
 
     def serialize(self, value, **kwargs):
-
         return self.format_as_utc(value) if value else None
 
     def deserialize(self, value, **kwargs):
@@ -117,7 +116,6 @@ class ISOUTCDate(ISOUTCDateTime):
 
     type = "date"
     message = u"'{val}' is not a valid ISO-8601 date"
-    format = "%Y-%m-%d"
 
 
 class String(Type):
