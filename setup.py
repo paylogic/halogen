@@ -72,7 +72,7 @@ setup(
         "Topic :: Utilities",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3"
-    ] + [("Programming Language :: Python :: %s" % x) for x in "2.6 2.7 3.4".split()],
+    ] + [("Programming Language :: Python :: %s" % x) for x in "2.7 3.4".split()],
     cmdclass={"test": ToxTestCommand},
     packages=["halogen"],
     install_requires=install_requires,
