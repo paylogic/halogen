@@ -14,7 +14,6 @@ tests_require = [
     "pytest-cov",
     "pytest-pep8",
     "pytest-pep257",
-    "coverage<4.0.0",
     "pytz",
 ]
 
