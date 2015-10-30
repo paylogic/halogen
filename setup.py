@@ -61,7 +61,7 @@ setuptools.setup(
         "Topic :: Utilities",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3"
-    ] + [("Programming Language :: Python :: %s" % x) for x in "2.6 2.7 3.4".split()],
+    ] + [("Programming Language :: Python :: %s" % x) for x in "2.7 3.4".split()],
     install_requires=install_requires,
     tests_require=tests_require,
     extras_require={
