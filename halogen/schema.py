@@ -8,6 +8,8 @@ try:
 except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict  # noqa
 
+from cached_property import cached_property
+
 from halogen import types
 from halogen import exceptions
 
@@ -136,7 +138,7 @@ class Attr(object):
         """The key of the this attribute will be placed into (within it's compartment)."""
         return self.name
 
-    @property
+    @cached_property
     def accessor(self):
         """Get an attribute's accessor with the getter and the setter.
 
@@ -205,6 +207,37 @@ class Attr(object):
             self.__class__.__name__,
             self.name,
         )
+
+    def setter(self, setter):
+        """Set an attribute setter accessor function.
+
+        Can be used as a decorator:
+            @total.setter
+            def set_total(obj, value):
+                obj.total = value
+        """
+        self.accessor.setter = setter
+
+    def __call__(self, getter):
+        """Decorate a getter accessor function."""
+        self.name = getter.__name__
+        self.accessor.getter = getter
+        return self
+
+
+def attr(*args, **kwargs):
+    """Attribute as a decorator alias.
+
+    Decorates the getter function like:
+
+        @halogen.attr(AmountType(), default=None)
+        def total(obj):
+            return sum((item.amount for item in obj.items), 0)
+
+    This is identical to using attr with a lambda, but more practical in case of larger functions:
+        total = halogen.Attr(AmountType(), default=None, attr=lambda obj: sum((item.amount for item in obj.items), 0))
+    """
+    return Attr(*args, **kwargs)
 
 
 class Link(Attr):

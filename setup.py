@@ -12,10 +12,11 @@ install_requires = [
     'isodate',
     'pytz',
     'six',
+    'cached-property',
 ]
 
 try:
-    from collections import OrderedDict  # noqa
+    from collections import OrderedDict # noqa
 except ImportError:  # pragma: no cover
     install_requires.append('ordereddict')
 

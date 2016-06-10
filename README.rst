@@ -311,6 +311,32 @@ Result:
     }
 
 
+Attribute as a decorator
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes accessor functions are too big for lambdas. In this case it is possible
+to decorate a method of the class to be a getter accessor.
+
+
+.. code-block:: python
+
+    import halogen
+
+    class ShoppingCartSchema(halogen.Schema):
+        
+        @halogen.attr(AmountType(), default=None)
+        def total(obj):
+            return sum(
+                (item.amount for item in obj.items),
+                0,
+            )
+
+        @total.setter
+        def set_total(obj, value):
+            obj.total = value
+
+
+
 Attr(attr=Acccessor)
 ~~~~~~~~~~~~~~~~~~~~
 

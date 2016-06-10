@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3.0
+-----
+
+* Attribute as a decorator (olegpidsadnyi)
+
+
 1.2.1
 -----
 
