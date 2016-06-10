@@ -56,3 +56,16 @@ def test_constant_href():
             "warehouse": {"deprecation": "http://foo.bar", "href": "/test/123"},
         }
     }
+
+
+def test_attr_decorator_getter():
+    """Test attribute as a decorator getter."""
+
+    class Schema(halogen.Schema):
+
+        @halogen.attr()
+        def total(obj):
+            return 123
+
+    data = Schema.serialize({"total": 555})
+    assert data["total"] == 123

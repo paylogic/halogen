@@ -1,14 +1,15 @@
 """halogen public API."""
 
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 
 try:
-    from halogen.schema import Schema, Attr, Link, Curie, Embedded, Accessor
+    from halogen.schema import Schema, attr, Attr, Link, Curie, Embedded, Accessor
     from halogen import types
     from halogen import validators
     from halogen import exceptions
 
     __all__ = [
+        "attr",
         "Accessor",
         "Attr",
         "Curie",
