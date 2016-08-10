@@ -22,7 +22,7 @@ class Type(object):
         """
         self.validators = validators or []
 
-    def serialize(self, value):
+    def serialize(self, value, **kwargs):
         """Serialization of value."""
         return value
 
@@ -30,7 +30,7 @@ class Type(object):
         """Deserialization of value.
 
         :return: Deserialized value.
-        :raises: :class:`halogen.exception.ValidationError` exception is value is not valid.
+        :raises: :class:`halogen.exception.ValidationError` exception if value is not valid.
         """
         for validator in self.validators:
             validator.validate(value)
@@ -210,7 +210,7 @@ class Amount(Type):
             "currency": str(currency),
         }
 
-    def serialize(self, value):
+    def serialize(self, value, **kwargs):
         """Serialize amount.
 
         :param value: Amount value.
