@@ -46,6 +46,7 @@ class ToxTestCommand(TestCommand):
         errno = tox.cmdline(args=shlex.split(self.tox_args))
         sys.exit(errno)
 
+
 long_description = []
 
 for text_file in ['README.rst', 'CHANGES.rst']:

@@ -69,6 +69,7 @@ def test_string():
     assert type_.serialize(None) == ""
     assert type_.deserialize("") == ""
     assert type_.deserialize("Some") == "Some"
+    assert type_.deserialize({"key": "value"}) == "{'key': 'value'}"
 
 
 def test_int():

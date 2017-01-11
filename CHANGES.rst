@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3.1
+-----
+
+* Fix for the String.deserialize to force the text type (olegpidsadnyi)
+
+
 1.3.0
 -----
 

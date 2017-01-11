@@ -129,7 +129,7 @@ class String(Type):
 
     def deserialize(self, value, **kwargs):
         if value is not None:
-            return super(String, self).deserialize(value)
+            return super(String, self).deserialize(six.text_type(value))
         return ""
 
 
