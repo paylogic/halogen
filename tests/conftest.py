@@ -1,4 +1,5 @@
 """Test configuration."""
+import inspect
 
 import halogen
 import mock
@@ -7,8 +8,13 @@ from .fixtures.common import *
 
 
 @pytest.fixture(scope="session")
-def mocked_get_context():
+def mocked_inspect_getargspec(request):
     """Mock halogen.schema._get_context for returning empty dict."""
-    patcher = mock.patch("halogen.schema._get_context")
+    def f():
+        return None
+
+    patcher = mock.patch("inspect.getargspec")
+    patcher.return_value = inspect.getargspec(f)
+
     patcher.start()
-    patcher.return_value = {}
+    request.addfinalizer(patcher.stop)

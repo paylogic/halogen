@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3.2
+-----
+
+* Improve serialization performance (youtux)
+
+
 1.3.1
 -----
 
