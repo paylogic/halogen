@@ -1,16 +1,9 @@
 sudo: false
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
 env:
   matrix:
   - TESTENV=py27
   - TESTENV=py34
-  - TESTENV=py35
-  - TESTENV=py36
   - TESTENV=coveralls
   global:
     secure: QdD3CypzsV9tDvnhDkObwRt5sWcsnRVa4sBMEzefRwUpAQmMZqcVRA5zZqI9M2qShMX2+EzG76ROKj+IuDrH5sycHRMsByx36qXWC6yTeFGO/qcvbamclP6tr0+/ld+3pSi2rlpVrc551/tMnhzymKuEaPn3bZJz0dx39ryjAGs=

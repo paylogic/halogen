@@ -4,7 +4,7 @@ Changelog
 1.3.2
 -----
 
-* Improve serialization performance and explicitly support Python 3.5 and 3.6 (youtux)
+* Improve serialization performance (youtux)
 
 
 1.3.1
