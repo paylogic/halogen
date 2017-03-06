@@ -26,14 +26,13 @@ def BYPASS(value):
     return value
 
 
-def _get_context(func, kwargs):
+def _get_context(argspec, kwargs):
     """Prepare a context for the serialization.
 
-    :param func: Function which needs or does not need kwargs.
+    :param argspec: The argspec of the serialization function.
     :param kwargs: Dict with context
     :return: Keywords arguments that function can accept.
     """
-    argspec = inspect.getargspec(func)
     if argspec.keywords is not None:
         return kwargs
     return dict((arg, kwargs[arg]) for arg in argspec.args if arg in kwargs)
@@ -48,6 +47,10 @@ class Accessor(object):
         self.getter = getter
         self.setter = setter
 
+    @cached_property
+    def _getter_argspec(self):
+        return inspect.getargspec(self.getter)
+
     def get(self, obj, **kwargs):
         """Get an attribute from a value.
 
@@ -56,7 +59,7 @@ class Accessor(object):
         """
         assert self.getter is not None, "Getter accessor is not specified."
         if callable(self.getter):
-            return self.getter(obj, **_get_context(self.getter, kwargs))
+            return self.getter(obj, **_get_context(self._getter_argspec, kwargs))
 
         assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
 
@@ -153,6 +156,10 @@ class Attr(object):
         attr = self.attr or self.name
         return Accessor(getter=attr, setter=attr)
 
+    @cached_property
+    def _attr_type_serialize_argspec(self):
+        return inspect.getargspec(self.attr_type.serialize)
+
     def serialize(self, value, **kwargs):
         """Serialize the attribute of the input data.
 
@@ -172,7 +179,7 @@ class Attr(object):
                     raise
                 value = self.default() if callable(self.default) else self.default
 
-            return self.attr_type.serialize(value, **_get_context(self.attr_type.serialize, kwargs))
+            return self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
 
         return self.attr_type
 
