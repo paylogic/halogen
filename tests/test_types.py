@@ -44,12 +44,19 @@ def test_isodatetime_bc():
     assert type_.deserialize('1799-12-31T23:00:00Z') == value.replace(microsecond=0)
 
 
-def test_isodatetime_wrong():
+@pytest.mark.parametrize(
+    "value",
+    [
+        "01.01.1981 11:11:11",
+        "123x3",
+    ],
+)
+def test_isodatetime_wrong(value):
     """Test iso datetime when wrong value is passed."""
     type_ = types.ISOUTCDateTime()
     with pytest.raises(ValueError) as err:
-        type_.deserialize("01.01.1981 11:11:11")
-    assert err.value.args[0] == "'01.01.1981 11:11:11' is not a valid ISO-8601 datetime"
+        type_.deserialize(value)
+    assert err.value.args[0] == "'{0}' is not a valid ISO-8601 datetime".format(value)
 
 
 def test_isodate():
