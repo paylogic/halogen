@@ -2,6 +2,7 @@
 import datetime
 import decimal
 
+import dateutil.parser
 import isodate
 import pytz
 import six
@@ -10,7 +11,6 @@ from .exceptions import ValidationError
 
 
 class Type(object):
-
     """Base class for creating types."""
 
     def __init__(self, validators=None, *args, **kwargs):
@@ -46,7 +46,6 @@ class Type(object):
 
 
 class List(Type):
-
     """List type for Halogen schema attribute."""
 
     def __init__(self, item_type=None, allow_scalar=False, *args, **kwargs):
@@ -83,7 +82,6 @@ class List(Type):
 
 
 class ISOUTCDateTime(Type):
-
     """ISO-8601 datetime schema type in UTC timezone."""
 
     type = "datetime"
@@ -103,6 +101,7 @@ class ISOUTCDateTime(Type):
     def deserialize(self, value, **kwargs):
         value = value() if callable(value) else value
         try:
+            dateutil.parser.parse(value)
             value = getattr(isodate, "parse_{0}".format(self.type))(value)
         except (isodate.ISO8601Error, ValueError):
             raise ValueError(self.message.format(val=value))
@@ -111,7 +110,6 @@ class ISOUTCDateTime(Type):
 
 
 class ISOUTCDate(ISOUTCDateTime):
-
     """ISO-8601 date schema type in UTC timezone."""
 
     type = "date"
@@ -119,7 +117,6 @@ class ISOUTCDate(ISOUTCDateTime):
 
 
 class String(Type):
-
     """String schema type."""
 
     def serialize(self, value, **kwargs):
@@ -134,7 +131,6 @@ class String(Type):
 
 
 class Int(Type):
-
     """Int schema type."""
 
     def serialize(self, value, **kwargs):
@@ -149,7 +145,6 @@ class Int(Type):
 
 
 class Boolean(Type):
-
     """Boolean schema type."""
 
     def serialize(self, value, **kwargs):
@@ -173,7 +168,6 @@ class Boolean(Type):
 
 
 class Amount(Type):
-
     """Amount (money) schema type."""
 
     err_unknown_currency = "'{currency}' is not a valid currency."

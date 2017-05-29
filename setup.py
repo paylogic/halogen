@@ -9,10 +9,11 @@ from setuptools.command.test import test as TestCommand
 import halogen
 
 install_requires = [
+    'cached-property',
     'isodate',
+    'python-dateutil',
     'pytz',
     'six',
-    'cached-property',
 ]
 
 try:

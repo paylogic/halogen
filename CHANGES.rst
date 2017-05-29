@@ -4,6 +4,11 @@ Changelog
 1.3.2
 -----
 
+* Strict validation of the ISO8601 (olegpidsadnyi)
+
+1.3.2
+-----
+
 * Improve serialization performance (youtux)
 
 
