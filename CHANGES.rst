@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.3.2
+1.3.3
 -----
 
 * Strict validation of the ISO8601 (olegpidsadnyi)
