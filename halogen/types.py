@@ -120,14 +120,10 @@ class String(Type):
     """String schema type."""
 
     def serialize(self, value, **kwargs):
-        if value:
-            return six.text_type(super(String, self).serialize(value))
-        return ""
+        return six.text_type(super(String, self).serialize(value)) if value is not None else None
 
     def deserialize(self, value, **kwargs):
-        if value is not None:
-            return super(String, self).deserialize(six.text_type(value))
-        return ""
+        return super(String, self).deserialize(six.text_type(value)) if value is not None else None
 
 
 class Int(Type):

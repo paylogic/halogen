@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.4.0
+-----
+
+* Support of the None for the String type (olegpidsadnyi)
+
+
 1.3.3
 -----
 
