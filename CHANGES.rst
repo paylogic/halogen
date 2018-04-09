@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3.4
+-----
+
+* Nullable type (olegpidsadnyi)
+
+
 1.3.3
 -----
 

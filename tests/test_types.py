@@ -138,18 +138,18 @@ def test_amount_invalid(value, expected):
     ["value", "expected"],
     [
         ("EUR1.22", {
-                "currency": "EUR",
-                "amount": decimal.Decimal("1.22")
-                }),
+            "currency": "EUR",
+            "amount": decimal.Decimal("1.22")
+        }),
         (None, None),
         ({'amount': '12.34', 'currency': 'EUR'}, {
-                "currency": "EUR",
-                "amount": decimal.Decimal("12.34")
-                }),
+            "currency": "EUR",
+            "amount": decimal.Decimal("12.34")
+        }),
         ("EUR12.34", {
-                "currency": "EUR",
-                "amount": decimal.Decimal("12.34")
-                }),
+            "currency": "EUR",
+            "amount": decimal.Decimal("12.34")
+        }),
     ]
 )
 def test_amount_valid(value, expected):
@@ -170,3 +170,19 @@ def test_amount_serialize():
     amount.as_quantized().as_tuple.return_value = ('EUR', 11.23)
     assert type_.serialize(amount) == {'amount': '11.23', 'currency': 'EUR'}
     assert type_.serialize(None) is None
+
+
+def test_nullable_type():
+
+    nested_type = mock.MagicMock(
+        serialize=mock.MagicMock(return_value="serialize"),
+        deserialize=mock.MagicMock(return_value="deserialize")
+    )
+
+    nullable = types.Nullable(nested_type)
+
+    assert nullable.serialize("test") == "serialize"
+    assert nullable.serialize(None) is None
+
+    assert nullable.deserialize("test") == "deserialize"
+    assert nullable.deserialize(None) is None
