@@ -502,6 +502,51 @@ Result:
         }
     }
 
+Nullable types
+~~~~~~~~~~~~~~
+
+In case the accessor returns None and the further serialization by a type or a nested schema
+is not desired the type can be wrapped into `Nullable` type.
+
+
+.. code-block:: python
+
+    import halogen
+
+
+    class FreeProduct(object):
+        """A free product, that doesn't have a price."""
+
+        price = None
+
+
+    class AmountSchema(halogen.Schema):
+
+        currency = halogen.Attr(required=True, default="USD")
+        amount = halogen.Attr(required=True, default=0)
+
+
+    class FreeProductSchema(halogen.Schema):
+        
+        price_null = halogen.Attr(halogen.types.Nullable(AmountType()), attr="price")
+        price_zero = halogen.Attr(AmountType(), attr="price")
+
+
+    serialized = FreeProductSchema.serialize(FreeProduct())
+
+
+Result:
+
+.. code-block:: json
+
+    {
+        "price_null": None,
+        "price_zero": {
+            "amount": 0,
+            "currency": "USD"
+        }
+    }
+
 
 HAL
 ===

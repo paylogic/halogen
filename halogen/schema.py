@@ -109,7 +109,6 @@ class Accessor(object):
 
 
 class Attr(object):
-
     """Schema attribute."""
 
     creation_counter = 0

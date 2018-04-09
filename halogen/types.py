@@ -120,10 +120,14 @@ class String(Type):
     """String schema type."""
 
     def serialize(self, value, **kwargs):
-        return six.text_type(super(String, self).serialize(value)) if value is not None else None
+        if value:
+            return six.text_type(super(String, self).serialize(value))
+        return ""
 
     def deserialize(self, value, **kwargs):
-        return super(String, self).deserialize(six.text_type(value)) if value is not None else None
+        if value is not None:
+            return super(String, self).deserialize(six.text_type(value))
+        return ""
 
 
 class Int(Type):
@@ -248,3 +252,21 @@ class Amount(Type):
 
         value = self.amount_class(currency=currency, amount=amount)
         return super(Amount, self).deserialize(value)
+
+
+class Nullable(Type):
+    """Nullable type."""
+
+    def __init__(self, nested_type, *args, **kwargs):
+        self.nested_type = nested_type
+        super(Nullable, self).__init__(*args, **kwargs)
+
+    def serialize(self, value, **kwargs):
+        if value is None:
+            return None
+        return self.nested_type.serialize(value, **kwargs)
+
+    def deserialize(self, value, **kwargs):
+        if value is None:
+            return None
+        return self.nested_type.deserialize(value, **kwargs)
