@@ -81,6 +81,26 @@ class List(Type):
         return result
 
 
+class ISODateTime(Type):
+    """ISO-8601 datetime schema type."""
+
+    type = "datetime"
+    message = u"'{val}' is not a valid ISO-8601 datetime"
+
+    def serialize(self, value, **kwargs):
+        return value.isoformat() if value else None
+
+    def deserialize(self, value, **kwargs):
+        value = value() if callable(value) else value
+        try:
+            dateutil.parser.parse(value)
+            value = getattr(isodate, "parse_{0}".format(self.type))(value)
+        except (isodate.ISO8601Error, ValueError):
+            raise ValueError(self.message.format(val=value))
+
+        return super(ISODateTime, self).deserialize(value)
+
+
 class ISOUTCDateTime(Type):
     """ISO-8601 datetime schema type in UTC timezone."""
 

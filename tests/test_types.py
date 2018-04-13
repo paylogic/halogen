@@ -8,6 +8,7 @@ import six
 import mock
 import pytest
 
+from pytz import timezone
 from halogen import types
 
 
@@ -27,7 +28,22 @@ def test_list():
     assert value == type_.deserialize(value)
 
 
-def test_isodatetime():
+@pytest.mark.parametrize(
+    ["value", "serialized"],
+    [
+        (timezone('Europe/Amsterdam').localize(datetime.datetime(2018, 12, 23, 16, 20)), '2018-12-23T16:20:00+01:00'),
+        (timezone('Europe/Amsterdam').localize(datetime.datetime(2018, 5, 14, 16, 20)), '2018-05-14T16:20:00+02:00'),
+        (timezone('UTC').localize(datetime.datetime(2018, 5, 14, 16, 20)), '2018-05-14T16:20:00+00:00'),
+    ]
+)
+def test_isodatetime(value, serialized):
+    """Test iso datetime."""
+    type_ = types.ISODateTime()
+    assert type_.serialize(value) == serialized
+    assert type_.deserialize(serialized) == value.replace(microsecond=0)
+
+
+def test_isoutcdatetime():
     """Test iso datetime."""
     type_ = types.ISOUTCDateTime()
     value = datetime.datetime.now(pytz.timezone("CET")).astimezone(pytz.UTC)
@@ -36,7 +52,7 @@ def test_isodatetime():
     assert type_.deserialize(serialized) == value.replace(microsecond=0)
 
 
-def test_isodatetime_bc():
+def test_isoutcdatetime_bc():
     """Test iso datetime with year before 1900."""
     type_ = types.ISOUTCDateTime()
     value = datetime.datetime(1800, 1, 1, tzinfo=pytz.timezone("CET"))
@@ -51,7 +67,7 @@ def test_isodatetime_bc():
         "123x3",
     ],
 )
-def test_isodatetime_wrong(value):
+def test_isoutcdatetime_wrong(value):
     """Test iso datetime when wrong value is passed."""
     type_ = types.ISOUTCDateTime()
     with pytest.raises(ValueError) as err:

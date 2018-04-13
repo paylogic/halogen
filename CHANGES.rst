@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.3.5
+-----
+
+* Add ISO Date Time type (moisesribeiro)
+
+
 1.3.4
 -----
 
