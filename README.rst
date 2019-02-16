@@ -1057,6 +1057,86 @@ as ``halogen.exceptions.ValidationError``. This is to eliminate the need of rais
 types and attributes during the deserialization.
 
 
+Vendor media types
+------------------
+
+Handling validation and business logic errors are as important as handling HAL responses.
+Halogen provides support for the vendor error media type, which is fully HAL-compatible.
+
+vnd.error
+=========
+
+The vendor error (application/vnd.error+json) has now been published as an internet draft: draft-vnd-error_
+
+.. _draft-vnd-error: http://nocarrier.co.uk/profiles/vnd.error/
+
+This mediatype is attempting to standartise the format in which the problem can be represented to many clients
+so that it can be expressed and understood.
+Multiple deserialization errors can be mapped to the relevant keys of the payload via the path attribute, which
+represents the JSON Pointer to the payload key, and therefore to the UI element that is serialized with that key.
+
+
+.. code-block:: python
+
+    import halogen
+    from halogen.vnd.error import Error, VNDError
+
+
+    class AuthorSchema(halogen.Schema):
+        name = halogen.Attr(required=True)
+
+
+    class PublisherSchema(halogen.Schema):
+        name = halogen.Attr(required=True)
+        address = halogen.Attr()
+
+
+    class BookSchema(halogen.Schema):
+        title = halogen.Attr(required=True)
+        year = halogen.Attr(halogen.types.Int(), required=True)
+        authors = halogen.Attr(halogen.types.List(AuthorSchema), required=True)
+        publisher = halogen.Attr(PublisherSchema)
+
+    try:
+        BookSchema.deserialize(
+            dict(
+                # title is skipped
+                year="abc",  # Not an integer
+                authors=[dict(name="John Smith"), dict()],  # Second author has no name
+                publisher=dict(address="Chasey Lane 42, Los Angeles, US"),  # No name
+            ),
+        )
+    except halogen.exceptions.ValidationError as e:
+        error = Error.from_validation_exception(e)
+
+    >>> error.errors
+    >>>
+        [
+            {"path": "/authors/1/name", "message": "Missing attribute."),
+            {"path": "/title", "message": "Missing attribute."),
+            {"path": "/year", "message": "'abc' is not an integer"),
+            {"path": "/publisher/name", "message": "Missing attribute."),
+        }
+
+
+The errors may or may not be related to the payload, but sometimes to another resources.
+In this case the about link should be returned within the error.
+
+.. code-block:: python
+
+    {
+        "_links": {
+            "about": {"href": "/products/1"}
+        },
+        "message": "The product is sold out."
+    }
+
+i18n
+~~~~
+
+The error messages should be internationalized and respect Accept-Language and Content-Language HTTP headers.
+
+
 Contact
 -------
 
