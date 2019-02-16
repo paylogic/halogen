@@ -38,7 +38,7 @@ def test_validation():
         BookSchema.deserialize(
             dict(
                 # title is skipped
-                year="abc",  # Not integer
+                year="abc",  # Not an integer
                 authors=[dict(name="John Smith"), dict()],  # Second author has no name
                 publisher=dict(address="Chasey Lane 42, Los Angeles, US"),  # No name
             ),
