@@ -1,4 +1,6 @@
+# coding=utf8
 """Test vnd.error."""
+
 
 import uuid
 
@@ -38,7 +40,7 @@ def test_validation():
         BookSchema.deserialize(
             dict(
                 # title is skipped
-                year="abc",  # Not an integer
+                year=u"☃bc",  # Not an integer
                 authors=[dict(name="John Smith"), dict()],  # Second author has no name
                 publisher=dict(address="Chasey Lane 42, Los Angeles, US"),  # No name
             ),
@@ -55,7 +57,7 @@ def test_validation():
     expected_errors = [
         dict(path="/authors/1/name", message="Missing attribute."),
         dict(path="/title", message="Missing attribute."),
-        dict(path="/year", message="'abc' is not an integer"),
+        dict(path="/year", message=u"'☃bc' is not an integer"),
         dict(path="/publisher/name", message="Missing attribute."),
     ]
     expected = {e["path"]: e for e in expected_errors}
