@@ -160,7 +160,7 @@ class Int(Type):
         try:
             value = int(value) if value is not None else None
         except ValueError:
-            raise ValueError("'{val}' is not an integer".format(val=value))
+            raise ValueError(u"'{val}' is not an integer".format(val=value))
         return super(Int, self).deserialize(value, **kwargs)
 
 
@@ -190,7 +190,7 @@ class Boolean(Type):
 class Amount(Type):
     """Amount (money) schema type."""
 
-    err_unknown_currency = "'{currency}' is not a valid currency."
+    err_unknown_currency = u"'{currency}' is not a valid currency."
 
     def __init__(self, currencies, amount_class, **kwargs):
         """Initialize new instance of Amount.
@@ -265,10 +265,10 @@ class Amount(Type):
         try:
             amount = decimal.Decimal(amount).normalize()
         except decimal.InvalidOperation:
-            raise ValueError("'{amount}' cannot be parsed to decimal.".format(amount=amount))
+            raise ValueError(u"'{amount}' cannot be parsed to decimal.".format(amount=amount))
 
         if amount.as_tuple().exponent < - 2:
-            raise ValueError("'{amount}' has more than 2 decimal places.".format(amount=amount))
+            raise ValueError(u"'{amount}' has more than 2 decimal places.".format(amount=amount))
 
         value = self.amount_class(currency=currency, amount=amount)
         return super(Amount, self).deserialize(value)

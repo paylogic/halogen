@@ -1,6 +1,7 @@
 """vnd.error support."""
 
 import halogen
+import six
 
 
 class Error(Exception):
@@ -41,7 +42,7 @@ class Error(Exception):
                     try:
                         message = error.message
                     except AttributeError:
-                        message = str(error)
+                        message = six.text_type(error)
                 # TODO: i18n
                 errors.append(Error(message=message, path=path))
 
