@@ -537,7 +537,7 @@ is not desired the type can be wrapped into `Nullable` type.
 
 Result:
 
-.. code-block:: json
+.. code-block:: python
 
     {
         "price_null": None,
@@ -668,7 +668,7 @@ Schema also can be a param to link
 
     serialized = BookSchema.serialize({"books": ""})
 
-.. code-block:: json
+.. code-block:: python
 
     {
         "_links": {
