@@ -1132,20 +1132,20 @@ In this case the about link should be returned within the error.
     }
 
 i18n
-~~~~
+----
 
 The error messages should be internationalized and respect Accept-Language and Content-Language HTTP headers.
 
 
 Contact
--------
+=======
 
 If you have questions, bug reports, suggestions, etc. please create an issue on
 the `GitHub project page <http://github.com/paylogic/halogen>`_.
 
 
 License
--------
+=======
 
 This software is licensed under the `MIT license <http://en.wikipedia.org/wiki/MIT_License>`_
 

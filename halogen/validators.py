@@ -21,7 +21,7 @@ class LessThanEqual(Validator):
 
     """Less than or equal."""
 
-    value_err = "{0} is bigger than {1}"
+    value_err = u"{0} is bigger than {1}"
 
     def __init__(self, value, value_err=None):
         """Less than or equal validator constructor.
@@ -45,7 +45,7 @@ class GreatThanEqual(Validator):
 
     """Greater than or equal."""
 
-    value_err = "{0} is smaller than {1}"
+    value_err = u"{0} is smaller than {1}"
 
     def __init__(self, value, value_err=None):
         """Greater than or equal validator constructor.
@@ -122,8 +122,8 @@ class Range(object):
     specified, or is specified as ``None``, no upper bound exists.
     """
 
-    min_err = '{val} is less than minimum value {min}'
-    max_err = '{val} is greater than maximum value {max}'
+    min_err = u'{val} is less than minimum value {min}'
+    max_err = u'{val} is greater than maximum value {max}'
 
     def __init__(self, min=None, max=None, min_err=None, max_err=None):
         """Range validator constructor.
