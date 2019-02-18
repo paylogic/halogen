@@ -48,7 +48,7 @@ class Error(Exception):
 
         flatten(exception)
         message = kwargs.pop("message", "Validation error.")
-        return cls(message=message, errors=sorted(errors, key=lambda error: error.path), **kwargs)
+        return cls(message=message, errors=sorted(errors, key=lambda error: error.path or ""), **kwargs)
 
 
 class VNDError(halogen.Schema):
