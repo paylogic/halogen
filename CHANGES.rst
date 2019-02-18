@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.3.6
+1.4.0
 -----
 
 * Support for vnd.error responses (olegpidsadnyi)
