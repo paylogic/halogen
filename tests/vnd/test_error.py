@@ -56,14 +56,9 @@ def test_validation():
 
     expected_errors = [
         dict(path="/authors/1/name", message="Missing attribute."),
+        dict(path="/publisher/name", message="Missing attribute."),
         dict(path="/title", message="Missing attribute."),
         dict(path="/year", message=u"'☃bc' is not an integer"),
-        dict(path="/publisher/name", message="Missing attribute."),
     ]
-    expected = {e["path"]: e for e in expected_errors}
-    errors = {e["path"]: e for e in data["_embedded"]["errors"]}
 
-    assert errors.keys() == expected.keys()
-    for path, exp in expected.items():
-        err = errors[path]
-        assert exp == dict(err)
+    assert data["_embedded"]["errors"] == expected_errors
