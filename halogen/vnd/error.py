@@ -25,10 +25,10 @@ class Error(Exception):
         """Create an error from validation exception."""
         errors = []
 
-        def flatten(error, path=""):
+        def flatten(error, path=u""):
             if isinstance(error, halogen.exceptions.ValidationError):
-                if not path.endswith("/"):
-                    path += "/"
+                if not path.endswith(u"/"):
+                    path += u"/"
                 if error.attr is not None:
                     path += error.attr
                 elif error.index is not None:
@@ -47,8 +47,8 @@ class Error(Exception):
                 errors.append(Error(message=message, path=path))
 
         flatten(exception)
-        message = kwargs.pop("message", "Validation error.")
-        return cls(message=message, errors=sorted(errors, key=lambda error: error.path or ""), **kwargs)
+        message = kwargs.pop(u"message", u"Validation error.")
+        return cls(message=message, errors=sorted(errors, key=lambda error: error.path or u""), **kwargs)
 
 
 class VNDError(halogen.Schema):
