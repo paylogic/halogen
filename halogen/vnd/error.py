@@ -32,7 +32,7 @@ class Error(Exception):
                 if error.attr is not None:
                     path += error.attr
                 elif error.index is not None:
-                    path += str(error.index)
+                    path += six.text_type(error.index)
 
                 for e in error.errors:
                     flatten(e, path)
