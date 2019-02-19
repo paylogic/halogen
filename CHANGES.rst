@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.4.1
+-----
+
+* Fix the package setup (olegpidsadnyi)
+
+
 1.4.0
 -----
 

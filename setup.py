@@ -79,7 +79,7 @@ setup(
         "Programming Language :: Python :: 3.4",
     ],
     cmdclass={"test": ToxTestCommand},
-    packages=["halogen"],
+    packages=["halogen", "halogen.vnd"],
     install_requires=install_requires,
     tests_require=["tox"],
 )
