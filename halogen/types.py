@@ -26,14 +26,14 @@ class Type(object):
         """Serialization of value."""
         return value
 
-    def deserialize(self, value):
+    def deserialize(self, value, **kwargs):
         """Deserialization of value.
 
         :return: Deserialized value.
         :raises: :class:`halogen.exception.ValidationError` exception if value is not valid.
         """
         for validator in self.validators:
-            validator.validate(value)
+            validator.validate(value, **kwargs)
 
         return value
 

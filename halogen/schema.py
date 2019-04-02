@@ -182,7 +182,7 @@ class Attr(object):
 
         return self.attr_type
 
-    def deserialize(self, value):
+    def deserialize(self, value, **kwargs):
         """Deserialize the attribute from a HAL structure.
 
         Get the value from the HAL structure from the attribute's compartment
@@ -200,12 +200,13 @@ class Attr(object):
             compartment = value[self.compartment]
 
         try:
-            value = self.accessor.get(compartment)
+            value = self.accessor.get(compartment, **kwargs)
         except (KeyError, AttributeError):
             if not hasattr(self, "default") and self.required:
                 raise
             return self.default() if callable(self.default) else self.default
-        return self.attr_type.deserialize(value)
+
+        return self.attr_type.deserialize(value, **kwargs)
 
     def __repr__(self):
         """Attribute representation."""
@@ -412,7 +413,7 @@ class _Schema(types.Type):
         return result
 
     @classmethod
-    def deserialize(cls, value, output=None):
+    def deserialize(cls, value, output=None, **kwargs):
         """Deserialize the HAL structure into the output value.
 
         :param value: Dict of already loaded json which will be deserialized by schema attributes.
@@ -426,7 +427,7 @@ class _Schema(types.Type):
         result = {}
         for attr in cls.__attrs__.values():
             try:
-                result[attr.name] = attr.deserialize(value)
+                result[attr.name] = attr.deserialize(value, **kwargs)
             except NotImplementedError:
                 # Links don't support deserialization
                 continue
