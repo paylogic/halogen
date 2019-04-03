@@ -1061,7 +1061,7 @@ Providing context
 ~~~~~~~~~~~~~~~~~
 
 When serializing or deserializing an object, not all data required for (de)serialization may be available in the object
-itself. You can pass this data as separate keyword parameters to `serialize` or ``deserialize`` to provide context.
+itself. You can pass this data as separate keyword arguments to `serialize` or ``deserialize`` to provide context.
 This context will be available in all nested schema, types and attributes.
 
 Serialize example:
