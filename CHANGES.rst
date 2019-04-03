@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.5.0
+-----
+
+* Allow passing context keyword arguments to deserialize methods (blaise-io)
+
+
 1.4.1
 -----
 
