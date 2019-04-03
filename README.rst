@@ -1057,15 +1057,39 @@ as ``halogen.exceptions.ValidationError``. This is to eliminate the need of rais
 types and attributes during the deserialization.
 
 
-Deserialization context
-~~~~~~~~~~~~~~~~~~~~~~~
+Providing context
+~~~~~~~~~~~~~~~~~
 
-When deserializing an object, not all data required for deserializiation may be available in the object itself.
-You can pass this data as separate keyword parameters to ``deserialize`` to provide context. This context will be
-available in all nested schema, types and attributes.
+When serializing or deserializing an object, not all data required for (de)serialization may be available in the object
+itself. You can pass this data as separate keyword parameters to `serialize` or ``deserialize`` to provide context.
+This context will be available in all nested schema, types and attributes.
+
+Serialize example:
+
+.. code-block:: python
+
+    class ErrorSchema(halogen.Schema):
+        message = halogen.Attr(
+            attr=lambda error, language: error["message"][language]
+        )
+
+    error = ErrorSchema.serialize({
+        "message": {
+            "dut": "Ongeldig e-mailadres",
+            "eng": "Invalid email address"
+        }
+    }, language="dut")
+
+    print error
+
+Result:
+
+.. code-block:: python
+
+    {"message": "Ongeldig e-mailadres"}
 
 
-Example:
+Deserialize example:
 
 .. code-block:: python
 
@@ -1106,7 +1130,6 @@ Example:
     }, language="eng")
 
     print author
-
 
 Result:
 
