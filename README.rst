@@ -323,7 +323,7 @@ to decorate a method of the class to be a getter accessor.
     import halogen
 
     class ShoppingCartSchema(halogen.Schema):
-        
+
         @halogen.attr(AmountType(), default=None)
         def total(obj):
             return sum(
@@ -527,7 +527,7 @@ is not desired the type can be wrapped into `Nullable` type.
 
 
     class FreeProductSchema(halogen.Schema):
-        
+
         price_null = halogen.Attr(halogen.types.Nullable(AmountType()), attr="price")
         price_zero = halogen.Attr(AmountType(), attr="price")
 
@@ -1055,6 +1055,70 @@ Result:
 Note that should ``ValueError`` exception happen on the attribute deserialization, it will be caught and reraized
 as ``halogen.exceptions.ValidationError``. This is to eliminate the need of raising halogen specific exceptions in
 types and attributes during the deserialization.
+
+
+Deserialization context
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When deserializing an object, not all data required for deserializiation may be available in the object itself.
+You can pass this data as separate keyword parameters to ``deserialize`` to provide context. This context will be
+available in all nested schema, types and attributes.
+
+
+Example:
+
+.. code-block:: python
+
+    import halogen
+
+
+    class Book(halogen.Schema):
+
+        @halogen.attr()
+        def title(obj, language):
+            return obj['title'][language]
+
+    class Author(halogen.Schema):
+        name = halogen.Attr(attr='author.name')
+        books = halogen.Attr(
+            halogen.types.List(Book),
+            attr='author.books',
+        )
+
+    author = Author.deserialize({
+        "author": {
+            "name": "Roald Dahl",
+            "books": [
+                {
+                    "title": {
+                        "dut": "De Heksen",
+                        "eng": "The Witches"
+                    }
+                },
+                {
+                    "title": {
+                        "dut": "Sjakie en de chocoladefabriek",
+                        "eng": "Charlie and the Chocolate Factory"
+                    }
+                }
+            ]
+        }
+    }, language="eng")
+
+    print author
+
+
+Result:
+
+.. code-block:: python
+
+    {
+        "name": "Roald Dahl",
+        "books": [
+            {"title": "The Witches"},
+            {"title": "Charlie and the Chocolate Factory"}
+        ]
+    }
 
 
 Vendor media types
