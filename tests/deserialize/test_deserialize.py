@@ -49,28 +49,61 @@ def test_deserialize_kwargs():
     assert deserialized["total_dot_sep_str"] == 123
 
 
+def test_deserialize_kwargs_type():
+    """Test that context is accessible in a type"""
+
+    class Schema(halogen.Schema):
+        @halogen.attr(halogen.types.ISOUTCDateTime())
+        def datetime(obj, date):
+            return '{}T{}Z'.format(date, obj['time'])
+
+    deserialized = Schema.deserialize(
+        {"time": "15:00:00"},
+        date="2030-01-01"
+    )
+
+    assert deserialized["datetime"].isoformat() == '2030-01-01T15:00:00+00:00'
+
+
 def test_deserialize_kwargs_list():
     """Test that context is maintained across a list"""
 
-    class Schema(halogen.Schema):
+    class Book(halogen.Schema):
         @halogen.attr()
-        def total(obj, custom_kwarg):
-            return obj['total'][custom_kwarg]
+        def title(obj, language):
+            return obj['title'][language]
 
-    class ListSchema(halogen.Schema):
-        deserialized_list = halogen.attr(halogen.types.List(Schema), attr='mylist')
+    class Author(halogen.Schema):
+        name = halogen.Attr(attr='author.name')
+        books = halogen.Attr(
+            halogen.types.List(Book),
+            attr='author.books',
+        )
 
-    deserialized = ListSchema.deserialize(
-        {
-            "mylist": [
-                {"total": {"mykey": 123}},
-                {"total": {"mykey": 234}},
+    author = Author.deserialize({
+        "author": {
+            "name": "Roald Dahl",
+            "books": [
+                {
+                    "title": {
+                        "dut": "De Heksen",
+                        "eng": "The Witches"
+                    }
+                },
+                {
+                    "title": {
+                        "dut": "Sjakie en de chocoladefabriek",
+                        "eng": "Charlie and the Chocolate Factory"
+                    }
+                }
             ]
-        },
-        custom_kwarg='mykey'
-    )
+        }
+    }, language="eng")
 
-    assert deserialized['deserialized_list'] == [
-        {"total": 123},
-        {"total": 234},
-    ]
+    assert author == {
+        "name": "Roald Dahl",
+        "books": [
+            {"title": "The Witches"},
+            {"title": "Charlie and the Chocolate Factory"}
+        ]
+    }
