@@ -69,3 +69,21 @@ def test_attr_decorator_getter():
 
     data = Schema.serialize({"total": 555})
     assert data["total"] == 123
+
+
+def test_context():
+    """Test passing context to serialize."""
+
+    class Error(halogen.Schema):
+        message = halogen.Attr(
+            attr=lambda error, language: error["message"][language]
+        )
+
+    error = Error.serialize({
+        "message": {
+            "dut": "Ongeldig e-mailadres",
+            "eng": "Invalid email address"
+        }
+    }, language="dut")
+
+    assert error == {"message": "Ongeldig e-mailadres"}
