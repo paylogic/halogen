@@ -252,7 +252,7 @@ class Link(Attr):
     """Link attribute of a schema."""
 
     def __init__(self, attr_type=None, attr=None, key=None, required=True,
-                 curie=None, templated=None, type=None, deprecation=None):
+                 curie=None, templated=None, type=None, deprecation=None, name=None, profile=None, title=None, hreflang=None):
         """Link constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -274,6 +274,10 @@ class Link(Attr):
                 'templated': templated,
                 'type': type,
                 'deprecation': deprecation,
+                'name': name,
+                'profile': profile,
+                'title': title,
+                'hreflang': hreflang,
             }
 
             class LinkSchema(Schema):
@@ -287,6 +291,18 @@ class Link(Attr):
 
                 if attrs['deprecation'] is not None:
                     deprecation = Attr(attr=lambda value: deprecation)
+
+                if attrs['name'] is not None:
+                    name = Attr(attr=lambda value: name)
+                
+                if attrs['profile'] is not None:
+                    profile = Attr(attr=lambda value: profile)
+
+                if attrs['title'] is not None:
+                    title = Attr(attr=lambda value: title)
+
+                if attrs['hreflang'] is not None:
+                    hreflang = Attr(attr=lambda value: hreflang)
 
             attr_type = LinkSchema
 
