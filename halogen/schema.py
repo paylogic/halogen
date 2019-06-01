@@ -294,7 +294,7 @@ class Link(Attr):
 
                 if attrs['name'] is not None:
                     name = Attr(attr=lambda value: name)
-                
+
                 if attrs['profile'] is not None:
                     profile = Attr(attr=lambda value: profile)
 
