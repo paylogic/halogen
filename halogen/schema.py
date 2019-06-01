@@ -252,7 +252,8 @@ class Link(Attr):
     """Link attribute of a schema."""
 
     def __init__(self, attr_type=None, attr=None, key=None, required=True,
-                 curie=None, templated=None, type=None, deprecation=None, name=None, profile=None, title=None, hreflang=None):
+                 curie=None, templated=None, type=None, deprecation=None,
+                 name=None, profile=None, title=None, hreflang=None):
         """Link constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
