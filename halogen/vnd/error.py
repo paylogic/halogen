@@ -40,7 +40,7 @@ class Error(Exception):
                     flatten(e, path)
             else:
                 if isinstance(error, Exception):
-                    message = six.text_type(error.message)
+                    message = six.text_type(error)
                 else:
                     message = error
                 # TODO: i18n
