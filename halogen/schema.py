@@ -20,14 +20,18 @@ def BYPASS(value):
     return value
 
 
-ArgSpec = namedtuple('ArgSpec', ['args', 'has_kwargs'])
+ArgSpec = namedtuple("ArgSpec", ["args", "has_kwargs"])
 
 
 if six.PY2:
+
     def getargspec(function):
         spec = inspect.getargspec(function)
         return ArgSpec(args=spec.args, has_kwargs=spec.keywords is not None)
+
+
 else:
+
     def getargspec(function):
         spec = inspect.getfullargspec(function)
         return ArgSpec(args=spec.args + spec.kwonlyargs, has_kwargs=spec.varkw is not None)
@@ -108,11 +112,7 @@ class Accessor(object):
 
     def __repr__(self):
         """Accessor representation."""
-        return "<{0} getter='{1}', setter='{2}'>".format(
-            self.__class__.__name__,
-            self.getter,
-            self.setter,
-        )
+        return "<{0} getter='{1}', setter='{2}'>".format(self.__class__.__name__, self.getter, self.setter)
 
 
 class Attr(object):
@@ -217,10 +217,7 @@ class Attr(object):
 
     def __repr__(self):
         """Attribute representation."""
-        return "<{0} '{1}'>".format(
-            self.__class__.__name__,
-            self.name,
-        )
+        return "<{0} '{1}'>".format(self.__class__.__name__, self.name)
 
     def setter(self, setter):
         """Set an attribute setter accessor function.
@@ -258,8 +255,17 @@ class Link(Attr):
 
     """Link attribute of a schema."""
 
-    def __init__(self, attr_type=None, attr=None, key=None, required=True,
-                 curie=None, templated=None, type=None, deprecation=None):
+    def __init__(
+        self,
+        attr_type=None,
+        attr=None,
+        key=None,
+        required=True,
+        curie=None,
+        templated=None,
+        type=None,
+        deprecation=None,
+    ):
         """Link constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -278,21 +284,21 @@ class Link(Attr):
                 attr = BYPASS
 
             attrs = {
-                'templated': templated,
-                'type': type,
-                'deprecation': deprecation,
+                "templated": templated,
+                "type": type,
+                "deprecation": deprecation,
             }
 
             class LinkSchema(Schema):
                 href = Attr(attr_type=attr_type, attr=BYPASS)
 
-                if attrs['templated'] is not None:
+                if attrs["templated"] is not None:
                     templated = Attr(attr=lambda value: templated)
 
-                if attrs['type'] is not None:
+                if attrs["type"] is not None:
                     type = Attr(attr=lambda value: type)
 
-                if attrs['deprecation'] is not None:
+                if attrs["deprecation"] is not None:
                     deprecation = Attr(attr=lambda value: deprecation)
 
             attr_type = LinkSchema
@@ -393,7 +399,7 @@ class _Schema(types.Type):
 
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
-        schema = type("Schema", (cls, ), {"__doc__": cls.__doc__})
+        schema = type("Schema", (cls,), {"__doc__": cls.__doc__})
         schema.__class_attrs__ = OrderedDict()
         schema.__attrs__ = OrderedDict()
         for name, attr in kwargs.items():
@@ -485,12 +491,7 @@ class _SchemaType(type):
 
         if curies:
             link = LinkList(
-                Schema(
-                    href=Attr(),
-                    name=Attr(),
-                    templated=Attr(required=False),
-                    type=Attr(required=False),
-                ),
+                Schema(href=Attr(), name=Attr(), templated=Attr(required=False), type=Attr(required=False)),
                 attr=lambda value: list(curies),
                 required=False,
             )
@@ -503,5 +504,5 @@ class _SchemaType(type):
             cls.__attrs__.update(getattr(base, "__class_attrs__", OrderedDict()))
 
 
-Schema = _SchemaType("Schema", (_Schema, ), {"__doc__": _Schema.__doc__})
+Schema = _SchemaType("Schema", (_Schema,), {"__doc__": _Schema.__doc__})
 """Schema is the basic class used for setting up schemas."""

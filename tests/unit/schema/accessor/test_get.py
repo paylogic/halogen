@@ -18,10 +18,7 @@ def basic_dict_get(dic):
     return dic["value"]
 
 
-@pytest.mark.parametrize(
-    "basic_object_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_object_value", VALUES)
 def test_get_object_callable(basic_object_value, basic_object):
     """Test return value of get with object.
 
@@ -41,20 +38,14 @@ def test_get_object_callable_called(mocked_inspect_getargspec, basic_object):
     acc.getter.assert_called_once_with(basic_object)
 
 
-@pytest.mark.parametrize(
-    "basic_object_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_object_value", VALUES)
 def test_get_object_string(basic_object, basic_object_value):
     """Test if Accessor.get() returns correct results when used with a dotted string."""
     acc = Accessor(getter="value")
     assert acc.get(basic_object) == basic_object_value
 
 
-@pytest.mark.parametrize(
-    "basic_dict_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_dict_value", VALUES)
 def test_get_dict_value(basic_dict_value, basic_dict):
     """Test return value of get with dict.
 
@@ -65,10 +56,7 @@ def test_get_dict_value(basic_dict_value, basic_dict):
     assert acc.get(basic_dict) == basic_dict_value
 
 
-@pytest.mark.parametrize(
-    "basic_dict_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_dict_value", VALUES)
 def test_get_dict_string(basic_dict_value, basic_dict):
     """Test return value of get with dict.
 
@@ -86,7 +74,7 @@ def test_get_dict_string(basic_dict_value, basic_dict):
         {"key": Obj(key="value")},
         Obj(key={"key": "value"}),
         Obj(key=Obj(key="value")),
-    ]
+    ],
 )
 def test_get_object_nested_dotted(basic_object, basic_object_value):
     """Test if accessor.get() correctly navigates nested values."""
