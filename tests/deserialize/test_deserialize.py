@@ -29,6 +29,10 @@ def test_deserialize_kwargs():
         def total_decorator(obj, custom_kwarg):
             return obj['total'][custom_kwarg]
 
+        @halogen.attr()
+        def total_decorator_kwargs(obj, **kwargs):
+            return obj['total'][kwargs['custom_kwarg']]
+
         total_lambda = halogen.Attr(attr=lambda obj, custom_kwarg: obj['total'][custom_kwarg])
 
         total_nested = halogen.Attr(
@@ -44,6 +48,7 @@ def test_deserialize_kwargs():
     )
 
     assert deserialized["total_decorator"] == 123
+    assert deserialized["total_decorator_kwargs"] == 123
     assert deserialized["total_lambda"] == 123
     assert deserialized["total_nested"]["nested"] == 123
     assert deserialized["total_dot_sep_str"] == 123
