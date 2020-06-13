@@ -39,12 +39,10 @@ class Error(Exception):
                 for e in error.errors:
                     flatten(e, path)
             else:
-                message = error
                 if isinstance(error, Exception):
-                    try:
-                        message = error.message
-                    except AttributeError:
-                        message = six.text_type(error)
+                    message = six.text_type(error.message)
+                else:
+                    message = error
                 # TODO: i18n
                 errors.append(Error(message=message, path=path))
 
