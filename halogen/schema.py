@@ -1,7 +1,8 @@
 """Halogen schema primitives."""
-
-import sys
+import collections
 import inspect
+
+import six
 
 try:
     from collections import OrderedDict
@@ -13,9 +14,8 @@ from cached_property import cached_property
 from halogen import types
 from halogen import exceptions
 
-PY2 = sys.version_info[0] == 2
 
-if not PY2:  # pragma: no cover
+if not six.PY2:  # pragma: no cover
     string_types = (str,)
 else:  # pragma: no cover
     string_types = (str, unicode)
@@ -26,6 +26,19 @@ def BYPASS(value):
     return value
 
 
+ArgSpec = collections.namedtuple('ArgSpec', ['args', 'has_kwargs'])
+
+
+if six.PY2:
+    def getargspec(function):
+        spec = inspect.getargspec(function)
+        return ArgSpec(args=spec.args, has_kwargs=spec.keywords is not None)
+else:
+    def getargspec(function):
+        spec = inspect.getfullargspec(function)
+        return ArgSpec(args=spec.args + spec.kwonlyargs, has_kwargs=spec.varkw is not None)
+
+
 def _get_context(argspec, kwargs):
     """Prepare a context for the serialization.
 
@@ -33,7 +46,7 @@ def _get_context(argspec, kwargs):
     :param kwargs: Dict with context
     :return: Keywords arguments that function can accept.
     """
-    if argspec.keywords is not None:
+    if argspec.has_kwargs is not None:
         return kwargs
     return dict((arg, kwargs[arg]) for arg in argspec.args if arg in kwargs)
 
@@ -47,9 +60,9 @@ class Accessor(object):
         self.getter = getter
         self.setter = setter
 
-    @cached_property
+    @cached_property  # Purposefully caching the function signature
     def _getter_argspec(self):
-        return inspect.getargspec(self.getter)
+        return getargspec(self.getter)
 
     def get(self, obj, **kwargs):
         """Get an attribute from a value.
@@ -157,7 +170,7 @@ class Attr(object):
 
     @cached_property
     def _attr_type_serialize_argspec(self):
-        return inspect.getargspec(self.attr_type.serialize)
+        return getargspec(self.attr_type.serialize)
 
     def serialize(self, value, **kwargs):
         """Serialize the attribute of the input data.
