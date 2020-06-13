@@ -1,9 +1,8 @@
 """Test configuration."""
-import inspect
-
-import halogen
 import mock
-import pytest
+
+
+from halogen.schema import getargspec
 from .fixtures.common import *
 
 
@@ -14,7 +13,7 @@ def mocked_inspect_getargspec(request):
         return None
 
     patcher = mock.patch("inspect.getargspec")
-    patcher.return_value = inspect.getargspec(f)
+    patcher.return_value = getargspec(f)
 
     patcher.start()
     request.addfinalizer(patcher.stop)
