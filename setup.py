@@ -16,38 +16,6 @@ install_requires = [
     'six',
 ]
 
-try:
-    from collections import OrderedDict # noqa
-except ImportError:  # pragma: no cover
-    install_requires.append('ordereddict')
-
-
-class ToxTestCommand(TestCommand):
-
-    """Test command which runs tox under the hood."""
-
-    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
-
-    def initialize_options(self):
-        """Initialize options and set their defaults."""
-        TestCommand.initialize_options(self)
-        self.tox_args = '--recreate'
-
-    def finalize_options(self):
-        """Add options to the test runner (tox)."""
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        """Invoke the test runner (tox)."""
-        # import here, cause outside the eggs aren't loaded
-        import tox
-        import shlex
-        errno = tox.cmdline(args=shlex.split(self.tox_args))
-        sys.exit(errno)
-
-
 long_description = []
 
 for text_file in ['README.rst', 'CHANGES.rst']:
@@ -77,9 +45,13 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
-    cmdclass={"test": ToxTestCommand},
     packages=["halogen", "halogen.vnd"],
     install_requires=install_requires,
     tests_require=["tox"],
+    python_requires=">2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
 )
