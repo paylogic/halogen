@@ -1,15 +1,9 @@
 """Halogen schema primitives."""
-import collections
 import inspect
-
-import six
-
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict  # noqa
+from collections import OrderedDict, namedtuple
 
 from cached_property import cached_property
+import six
 
 from halogen import types
 from halogen import exceptions
@@ -26,7 +20,7 @@ def BYPASS(value):
     return value
 
 
-ArgSpec = collections.namedtuple('ArgSpec', ['args', 'has_kwargs'])
+ArgSpec = namedtuple('ArgSpec', ['args', 'has_kwargs'])
 
 
 if six.PY2:
