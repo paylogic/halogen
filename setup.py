@@ -1,20 +1,10 @@
 """Setuptools entry point."""
 import codecs
-import sys
 from os.path import abspath, dirname, join
 
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 
 import halogen
-
-install_requires = [
-    'cached-property',
-    'isodate',
-    'python-dateutil',
-    'pytz',
-    'six',
-]
 
 long_description = []
 
@@ -51,7 +41,13 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     packages=["halogen", "halogen.vnd"],
-    install_requires=install_requires,
+    install_requires=[
+        "cached-property",
+        "isodate",
+        "python-dateutil",
+        "pytz",
+        "six",
+    ],
     tests_require=["tox"],
     python_requires=">2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
 )
