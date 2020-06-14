@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Fix DeprecationWarnings being raised (youtux)
+
+
 1.5.0
 -----
 

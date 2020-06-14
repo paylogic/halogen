@@ -12,11 +12,7 @@ def test_link_simple():
     class Schema(halogen.Schema):
         self = halogen.Link(attr="uid")
 
-    assert Schema.serialize(data) == {
-        "_links": {
-            "self": {"href": "/test/123"}
-        }
-    }
+    assert Schema.serialize(data) == {"_links": {"self": {"href": "/test/123"}}}
 
 
 def test_curies():
@@ -33,36 +29,26 @@ def test_curies():
         warehouse = halogen.Link(curie=ACME)
 
     assert Schema.serialize(data) == {
-        "_links": {
-            "curies": [{
-                "name": "acme",
-                "href": "/test/123",
-            }],
-            "acme:warehouse": {"href": "/test/123"},
-        }
+        "_links": {"curies": [{"name": "acme", "href": "/test/123"}], "acme:warehouse": {"href": "/test/123"}}
     }
 
 
 def test_constant_href():
     """Test if serializing a constant attribute works correctly."""
+
     class Schema(halogen.Schema):
 
         """A test schema."""
 
         warehouse = halogen.Link("/test/123", deprecation="http://foo.bar")
 
-    assert Schema.serialize({}) == {
-        "_links": {
-            "warehouse": {"deprecation": "http://foo.bar", "href": "/test/123"},
-        }
-    }
+    assert Schema.serialize({}) == {"_links": {"warehouse": {"deprecation": "http://foo.bar", "href": "/test/123"}}}
 
 
 def test_attr_decorator_getter():
     """Test attribute as a decorator getter."""
 
     class Schema(halogen.Schema):
-
         @halogen.attr()
         def total(obj):
             return 123
@@ -75,15 +61,10 @@ def test_context():
     """Test passing context to serialize."""
 
     class Error(halogen.Schema):
-        message = halogen.Attr(
-            attr=lambda error, language: error["message"][language]
-        )
+        message = halogen.Attr(attr=lambda error, language: error["message"][language])
 
-    error = Error.serialize({
-        "message": {
-            "dut": "Ongeldig e-mailadres",
-            "eng": "Invalid email address"
-        }
-    }, language="dut")
+    error = Error.serialize(
+        {"message": {"dut": "Ongeldig e-mailadres", "eng": "Invalid email address"}}, language="dut",
+    )
 
     assert error == {"message": "Ongeldig e-mailadres"}

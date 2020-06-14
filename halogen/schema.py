@@ -1,21 +1,15 @@
 """Halogen schema primitives."""
-
-import sys
 import inspect
-
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict  # noqa
+from collections import OrderedDict, namedtuple
 
 from cached_property import cached_property
+import six
 
 from halogen import types
 from halogen import exceptions
 
-PY2 = sys.version_info[0] == 2
 
-if not PY2:  # pragma: no cover
+if not six.PY2:  # pragma: no cover
     string_types = (str,)
 else:  # pragma: no cover
     string_types = (str, unicode)
@@ -26,6 +20,23 @@ def BYPASS(value):
     return value
 
 
+ArgSpec = namedtuple("ArgSpec", ["args", "has_kwargs"])
+
+
+if six.PY2:
+
+    def getargspec(function):
+        spec = inspect.getargspec(function)
+        return ArgSpec(args=spec.args, has_kwargs=spec.keywords is not None)
+
+
+else:
+
+    def getargspec(function):
+        spec = inspect.getfullargspec(function)
+        return ArgSpec(args=spec.args + spec.kwonlyargs, has_kwargs=spec.varkw is not None)
+
+
 def _get_context(argspec, kwargs):
     """Prepare a context for the serialization.
 
@@ -33,7 +44,7 @@ def _get_context(argspec, kwargs):
     :param kwargs: Dict with context
     :return: Keywords arguments that function can accept.
     """
-    if argspec.keywords is not None:
+    if argspec.has_kwargs is not None:
         return kwargs
     return dict((arg, kwargs[arg]) for arg in argspec.args if arg in kwargs)
 
@@ -47,9 +58,9 @@ class Accessor(object):
         self.getter = getter
         self.setter = setter
 
-    @cached_property
+    @cached_property  # Purposefully caching the function signature
     def _getter_argspec(self):
-        return inspect.getargspec(self.getter)
+        return getargspec(self.getter)
 
     def get(self, obj, **kwargs):
         """Get an attribute from a value.
@@ -101,11 +112,7 @@ class Accessor(object):
 
     def __repr__(self):
         """Accessor representation."""
-        return "<{0} getter='{1}', setter='{2}'>".format(
-            self.__class__.__name__,
-            self.getter,
-            self.setter,
-        )
+        return "<{0} getter='{1}', setter='{2}'>".format(self.__class__.__name__, self.getter, self.setter)
 
 
 class Attr(object):
@@ -157,7 +164,7 @@ class Attr(object):
 
     @cached_property
     def _attr_type_serialize_argspec(self):
-        return inspect.getargspec(self.attr_type.serialize)
+        return getargspec(self.attr_type.serialize)
 
     def serialize(self, value, **kwargs):
         """Serialize the attribute of the input data.
@@ -210,10 +217,7 @@ class Attr(object):
 
     def __repr__(self):
         """Attribute representation."""
-        return "<{0} '{1}'>".format(
-            self.__class__.__name__,
-            self.name,
-        )
+        return "<{0} '{1}'>".format(self.__class__.__name__, self.name)
 
     def setter(self, setter):
         """Set an attribute setter accessor function.
@@ -251,8 +255,17 @@ class Link(Attr):
 
     """Link attribute of a schema."""
 
-    def __init__(self, attr_type=None, attr=None, key=None, required=True,
-                 curie=None, templated=None, type=None, deprecation=None):
+    def __init__(
+        self,
+        attr_type=None,
+        attr=None,
+        key=None,
+        required=True,
+        curie=None,
+        templated=None,
+        type=None,
+        deprecation=None,
+    ):
         """Link constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -271,21 +284,21 @@ class Link(Attr):
                 attr = BYPASS
 
             attrs = {
-                'templated': templated,
-                'type': type,
-                'deprecation': deprecation,
+                "templated": templated,
+                "type": type,
+                "deprecation": deprecation,
             }
 
             class LinkSchema(Schema):
                 href = Attr(attr_type=attr_type, attr=BYPASS)
 
-                if attrs['templated'] is not None:
+                if attrs["templated"] is not None:
                     templated = Attr(attr=lambda value: templated)
 
-                if attrs['type'] is not None:
+                if attrs["type"] is not None:
                     type = Attr(attr=lambda value: type)
 
-                if attrs['deprecation'] is not None:
+                if attrs["deprecation"] is not None:
                     deprecation = Attr(attr=lambda value: deprecation)
 
             attr_type = LinkSchema
@@ -386,7 +399,7 @@ class _Schema(types.Type):
 
     def __new__(cls, **kwargs):
         """Create schema from keyword arguments."""
-        schema = type("Schema", (cls, ), {"__doc__": cls.__doc__})
+        schema = type("Schema", (cls,), {"__doc__": cls.__doc__})
         schema.__class_attrs__ = OrderedDict()
         schema.__attrs__ = OrderedDict()
         for name, attr in kwargs.items():
@@ -478,12 +491,7 @@ class _SchemaType(type):
 
         if curies:
             link = LinkList(
-                Schema(
-                    href=Attr(),
-                    name=Attr(),
-                    templated=Attr(required=False),
-                    type=Attr(required=False),
-                ),
+                Schema(href=Attr(), name=Attr(), templated=Attr(required=False), type=Attr(required=False)),
                 attr=lambda value: list(curies),
                 required=False,
             )
@@ -496,5 +504,5 @@ class _SchemaType(type):
             cls.__attrs__.update(getattr(base, "__class_attrs__", OrderedDict()))
 
 
-Schema = _SchemaType("Schema", (_Schema, ), {"__doc__": _Schema.__doc__})
+Schema = _SchemaType("Schema", (_Schema,), {"__doc__": _Schema.__doc__})
 """Schema is the basic class used for setting up schemas."""

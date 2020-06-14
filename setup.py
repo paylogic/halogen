@@ -8,14 +8,14 @@ import halogen
 
 long_description = []
 
-for text_file in ['README.rst', 'CHANGES.rst']:
-    with codecs.open(join(dirname(abspath(__file__)), text_file), encoding='utf-8') as f:
+for text_file in ["README.rst", "CHANGES.rst"]:
+    with codecs.open(join(dirname(abspath(__file__)), text_file), encoding="utf-8") as f:
         long_description.append(f.read())
 
 setup(
     name="halogen",
     description="Python HAL generation/parsing library",
-    long_description='\n'.join(long_description),
+    long_description="\n".join(long_description),
     author="Oleg Pidsadnyi, Paylogic International and others",
     license="MIT license",
     author_email="developers@paylogic.com",
@@ -41,13 +41,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     packages=["halogen", "halogen.vnd"],
-    install_requires=[
-        "cached-property",
-        "isodate",
-        "python-dateutil",
-        "pytz",
-        "six",
-    ],
+    install_requires=["cached-property", "isodate", "python-dateutil", "pytz", "six"],
     tests_require=["tox"],
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
 )

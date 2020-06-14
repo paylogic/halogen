@@ -5,5 +5,5 @@ from halogen.schema import Attr
 def test_attr_repr():
     """Test Attr repr."""
     attr = Attr()
-    attr.name = 'some'
+    attr.name = "some"
     assert repr(attr) == "<Attr 'some'>"

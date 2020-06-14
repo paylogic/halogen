@@ -22,6 +22,7 @@ class ValidationError(Exception):
             - attr: Attribute which contains the error, or "<root>" if it refers to the schema root.
             - errors: A list of dictionary representations of the errors.
         """
+
         def exception_to_dict(e):
             try:
                 return e.to_dict()
@@ -31,9 +32,7 @@ class ValidationError(Exception):
                     "error": str(e),
                 }
 
-        result = {
-            "errors": [exception_to_dict(e) for e in self.errors]
-        }
+        result = {"errors": [exception_to_dict(e) for e in self.errors]}
         if self.index is not None:
             result["index"] = self.index
         else:

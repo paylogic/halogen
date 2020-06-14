@@ -31,10 +31,10 @@ def test_list():
 @pytest.mark.parametrize(
     ["value", "serialized"],
     [
-        (timezone('Europe/Amsterdam').localize(datetime.datetime(2018, 12, 23, 16, 20)), '2018-12-23T16:20:00+01:00'),
-        (timezone('Europe/Amsterdam').localize(datetime.datetime(2018, 5, 14, 16, 20)), '2018-05-14T16:20:00+02:00'),
-        (timezone('UTC').localize(datetime.datetime(2018, 5, 14, 16, 20)), '2018-05-14T16:20:00+00:00'),
-    ]
+        (timezone("Europe/Amsterdam").localize(datetime.datetime(2018, 12, 23, 16, 20)), "2018-12-23T16:20:00+01:00"),
+        (timezone("Europe/Amsterdam").localize(datetime.datetime(2018, 5, 14, 16, 20)), "2018-05-14T16:20:00+02:00"),
+        (timezone("UTC").localize(datetime.datetime(2018, 5, 14, 16, 20)), "2018-05-14T16:20:00+00:00"),
+    ],
 )
 def test_isodatetime(value, serialized):
     """Test iso datetime."""
@@ -56,16 +56,12 @@ def test_isoutcdatetime_bc():
     """Test iso datetime with year before 1900."""
     type_ = types.ISOUTCDateTime()
     value = datetime.datetime(1800, 1, 1, tzinfo=pytz.timezone("CET"))
-    assert type_.serialize(value) == '1799-12-31T23:00:00Z'
-    assert type_.deserialize('1799-12-31T23:00:00Z') == value.replace(microsecond=0)
+    assert type_.serialize(value) == "1799-12-31T23:00:00Z"
+    assert type_.deserialize("1799-12-31T23:00:00Z") == value.replace(microsecond=0)
 
 
 @pytest.mark.parametrize(
-    "value",
-    [
-        "01.01.1981 11:11:11",
-        "123x3",
-    ],
+    "value", ["01.01.1981 11:11:11", "123x3"],
 )
 def test_isoutcdatetime_wrong(value):
     """Test iso datetime when wrong value is passed."""
@@ -116,7 +112,7 @@ def test_int():
         ("True", "0", True),
         ("false", 0, False),
         ("False", 0.0, False),
-    ]
+    ],
 )
 def test_boolean(value, clean_value, expected):
     """Test boolean type."""
@@ -140,7 +136,7 @@ def test_boolean_invalid():
         ("INV1", "'INV' is not a valid currency."),
         ("EURnot-number", "'not-number' cannot be parsed to decimal."),
         ("EUR 11.234", "'11.234' has more than 2 decimal places."),
-    ]
+    ],
 )
 def test_amount_invalid(value, expected):
     """Test amount type deserialization when invalid value is passed."""
@@ -153,20 +149,11 @@ def test_amount_invalid(value, expected):
 @pytest.mark.parametrize(
     ["value", "expected"],
     [
-        ("EUR1.22", {
-            "currency": "EUR",
-            "amount": decimal.Decimal("1.22")
-        }),
+        ("EUR1.22", {"currency": "EUR", "amount": decimal.Decimal("1.22")}),
         (None, None),
-        ({'amount': '12.34', 'currency': 'EUR'}, {
-            "currency": "EUR",
-            "amount": decimal.Decimal("12.34")
-        }),
-        ("EUR12.34", {
-            "currency": "EUR",
-            "amount": decimal.Decimal("12.34")
-        }),
-    ]
+        ({"amount": "12.34", "currency": "EUR"}, {"currency": "EUR", "amount": decimal.Decimal("12.34")}),
+        ("EUR12.34", {"currency": "EUR", "amount": decimal.Decimal("12.34")}),
+    ],
 )
 def test_amount_valid(value, expected):
     """Test amount type with valid input."""
@@ -183,16 +170,15 @@ def test_amount_serialize():
         type_.serialize(amount)
     assert err.value.args[0] == "'1' is not a valid currency."
 
-    amount.as_quantized().as_tuple.return_value = ('EUR', 11.23)
-    assert type_.serialize(amount) == {'amount': '11.23', 'currency': 'EUR'}
+    amount.as_quantized().as_tuple.return_value = ("EUR", 11.23)
+    assert type_.serialize(amount) == {"amount": "11.23", "currency": "EUR"}
     assert type_.serialize(None) is None
 
 
 def test_nullable_type():
 
     nested_type = mock.MagicMock(
-        serialize=mock.MagicMock(return_value="serialize"),
-        deserialize=mock.MagicMock(return_value="deserialize")
+        serialize=mock.MagicMock(return_value="serialize"), deserialize=mock.MagicMock(return_value="deserialize"),
     )
 
     nullable = types.Nullable(nested_type)
