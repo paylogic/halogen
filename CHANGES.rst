@@ -1,10 +1,11 @@
 Changelog
 =========
 
-Unreleased
-----------
+1.6.0
+-----
 
 * Fix DeprecationWarnings being raised (youtux)
+* Dropped support for python 2.6 and add declare support for python 3.5, 3.6, 3.7, 3.8
 
 
 1.5.0
