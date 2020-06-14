@@ -113,7 +113,7 @@ class ISOUTCDateTime(Type):
             if value.tzinfo is not None:
                 value = value.astimezone(pytz.UTC)
             value = value.replace(microsecond=0)
-        return value.isoformat().replace('+00:00', 'Z')
+        return value.isoformat().replace("+00:00", "Z")
 
     def serialize(self, value, **kwargs):
         return self.format_as_utc(value) if value else None
@@ -267,7 +267,7 @@ class Amount(Type):
         except decimal.InvalidOperation:
             raise ValueError(u"'{amount}' cannot be parsed to decimal.".format(amount=amount))
 
-        if amount.as_tuple().exponent < - 2:
+        if amount.as_tuple().exponent < -2:
             raise ValueError(u"'{amount}' has more than 2 decimal places.".format(amount=amount))
 
         value = self.amount_class(currency=currency, amount=amount)

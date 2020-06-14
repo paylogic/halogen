@@ -18,10 +18,7 @@ def basic_set_dict(dic, value):
     dic["value"] = value
 
 
-@pytest.mark.parametrize(
-    "basic_object_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_object_value", VALUES)
 def test_set_object_callable(basic_object, basic_object_value):
     """Test if Accessor.set() sets the value of an object when setter is callable."""
     acc = Accessor(setter=basic_set_object)
@@ -41,10 +38,7 @@ def test_set_object_callable_called(basic_object):
     acc.setter.assert_called_once_with(basic_object, "")
 
 
-@pytest.mark.parametrize(
-    "basic_object_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_object_value", VALUES)
 def test_set_object_string(basic_object, basic_object_value):
     """Test if Accessor.set() sets the value of an object when setter is a string."""
     acc = Accessor(setter="value")
@@ -55,10 +49,7 @@ def test_set_object_string(basic_object, basic_object_value):
     assert basic_object.value == basic_object_value
 
 
-@pytest.mark.parametrize(
-    "basic_dict_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_dict_value", VALUES)
 def test_set_dict_callable(basic_dict, basic_dict_value):
     """Test if Accessor.set() sets the value of an dict if setter is callable."""
     acc = Accessor(setter=basic_set_dict)
@@ -69,10 +60,7 @@ def test_set_dict_callable(basic_dict, basic_dict_value):
     assert basic_dict["value"] == basic_dict_value
 
 
-@pytest.mark.parametrize(
-    "basic_dict_value",
-    VALUES
-)
+@pytest.mark.parametrize("basic_dict_value", VALUES)
 def test_set_dict_string(basic_dict, basic_dict_value):
     """Test if setting values in a dict works if setter is a string."""
     acc = Accessor(setter="value")
@@ -85,12 +73,7 @@ def test_set_dict_string(basic_dict, basic_dict_value):
 
 @pytest.mark.parametrize(
     "basic_object_value",
-    [
-        {"key": {"key": "value"}},
-        {"key": Obj(key="value")},
-        Obj(key={"key": "value"}),
-        Obj(key=Obj(key="value")),
-    ]
+    [{"key": {"key": "value"}}, {"key": Obj(key="value")}, Obj(key={"key": "value"}), Obj(key=Obj(key="value"))],
 )
 def test_set_object_nested_dotted(basic_object, basic_object_value):
     """Test if accessor.get() correctly navigates nested values."""

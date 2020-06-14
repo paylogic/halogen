@@ -9,6 +9,7 @@ from .fixtures.common import *
 @pytest.fixture(scope="session")
 def mocked_inspect_getargspec(request):
     """Mock halogen.schema._get_context for returning empty dict."""
+
     def f():
         return None
 

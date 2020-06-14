@@ -9,7 +9,6 @@ from halogen.vnd.error import Error, VNDError
 
 
 class APIError(Error):
-
     def __init__(self, status_code, **kwargs):
         super(APIError, self).__init__(**kwargs)
         self.status_code = status_code

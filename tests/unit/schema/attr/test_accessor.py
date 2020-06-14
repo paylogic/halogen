@@ -6,7 +6,7 @@ from halogen.schema import Attr, Accessor
 def test_accessor_accessor():
     """Test if accessor returns the correct Accessor object when the attr property is an accessor."""
     attr = Attr()
-    attr.name = 'name'
+    attr.name = "name"
     acc = Accessor()
     attr.attr = acc
 
@@ -16,8 +16,8 @@ def test_accessor_accessor():
 def test_accessor_string():
     """Test if accessor returns the correct Accessor object when the attr property is a string."""
     attr = Attr()
-    attr.name = 'name'
-    attr.attr = 'attribute'
+    attr.name = "name"
+    attr.attr = "attribute"
 
     acc = attr.accessor
     assert isinstance(acc, Accessor)
@@ -28,7 +28,7 @@ def test_accessor_string():
 def test_accessor_callable():
     """Test if accessor returns the correct Accessor object when the attr property is a callable."""
     attr = Attr()
-    attr.name = 'name'
+    attr.name = "name"
     attr.attr = lambda x: x
 
     acc = attr.accessor
@@ -40,7 +40,7 @@ def test_accessor_callable():
 def test_accessor_name():
     """Test if accessor returns the correct Accessor object when the attr property is Falsy."""
     attr = Attr()
-    attr.name = 'name'
+    attr.name = "name"
     attr.attr = None
 
     acc = attr.accessor

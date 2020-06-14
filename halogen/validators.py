@@ -122,8 +122,8 @@ class Range(object):
     specified, or is specified as ``None``, no upper bound exists.
     """
 
-    min_err = u'{val} is less than minimum value {min}'
-    max_err = u'{val} is greater than maximum value {max}'
+    min_err = u"{val} is less than minimum value {min}"
+    max_err = u"{val} is greater than maximum value {max}"
 
     def __init__(self, min=None, max=None, min_err=None, max_err=None):
         """Range validator constructor.

@@ -5,14 +5,14 @@ import pytest
 
 
 VALUES = [
-    'hello world',
+    "hello world",
     123456,
-    {'hello': 'world'},
-    ('hello', 'world'),
-    ['hello', 'world'],
+    {"hello": "world"},
+    ("hello", "world"),
+    ["hello", "world"],
 ]
 
-Obj = namedtuple('Obj', ['key'])
+Obj = namedtuple("Obj", ["key"])
 
 
 @pytest.fixture
@@ -24,6 +24,7 @@ def basic_object_value():
 @pytest.fixture
 def basic_object(basic_object_value):
     """Instance of basic_object."""
+
     class basic_object(object):
 
         """Simple object with one property."""
@@ -43,4 +44,4 @@ def basic_dict_value():
 @pytest.fixture
 def basic_dict(basic_dict_value):
     """A basic dictionary."""
-    return {'value': basic_dict_value}
+    return {"value": basic_dict_value}
