@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.6.1
+-----
+
+* Hotfix for 1.6.0: Fix serialization/deserialization error `Schema.serialize(...)` is invoked with kwargs and there are attributes using callables that don't require those kwargs.
+
+
 1.6.0
 -----
 

@@ -57,6 +57,23 @@ def test_attr_decorator_getter():
     assert data["total"] == 123
 
 
+def test_attr_function_context_not_forwarded_if_not_requested():
+    """Test that we don't pass context kwargs to attribute getters that don't require them."""
+
+    class Schema(halogen.Schema):
+        @halogen.attr()
+        def foo(obj):
+            return obj["foo"] + 1
+
+        @halogen.attr()
+        def foo_with_context(obj, a_context_variable):
+            return obj["foo"] + a_context_variable
+
+    data = Schema.serialize({"foo": 1}, a_context_variable=42)
+    assert data["foo"] == 2
+    assert data["foo_with_context"] == 43
+
+
 def test_context():
     """Test passing context to serialize."""
 
