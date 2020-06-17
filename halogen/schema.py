@@ -44,7 +44,7 @@ def _get_context(argspec, kwargs):
     :param kwargs: Dict with context
     :return: Keywords arguments that function can accept.
     """
-    if argspec.has_kwargs is not None:
+    if argspec.has_kwargs:
         return kwargs
     return dict((arg, kwargs[arg]) for arg in argspec.args if arg in kwargs)
 
