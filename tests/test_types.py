@@ -69,9 +69,7 @@ def test_isoutcdatetime_bc():
     assert type_.deserialize("1799-12-31T23:00:00Z") == value.replace(microsecond=0)
 
 
-@pytest.mark.parametrize(
-    "value", ["01.01.1981 11:11:11", "123x3"],
-)
+@pytest.mark.parametrize("value", ["01.01.1981 11:11:11", "123x3"])
 def test_isoutcdatetime_wrong(value):
     """Test iso datetime when wrong value is passed."""
     type_ = types.ISOUTCDateTime()
@@ -187,7 +185,8 @@ def test_amount_serialize():
 def test_nullable_type():
 
     nested_type = mock.MagicMock(
-        serialize=mock.MagicMock(return_value="serialize"), deserialize=mock.MagicMock(return_value="deserialize"),
+        serialize=mock.MagicMock(return_value="serialize"),
+        deserialize=mock.MagicMock(return_value="deserialize"),
     )
 
     nullable = types.Nullable(nested_type)

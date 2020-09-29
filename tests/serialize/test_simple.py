@@ -81,7 +81,8 @@ def test_context():
         message = halogen.Attr(attr=lambda error, language: error["message"][language])
 
     error = Error.serialize(
-        {"message": {"dut": "Ongeldig e-mailadres", "eng": "Invalid email address"}}, language="dut",
+        {"message": {"dut": "Ongeldig e-mailadres", "eng": "Invalid email address"}},
+        language="dut",
     )
 
     assert error == {"message": "Ongeldig e-mailadres"}
