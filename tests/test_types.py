@@ -10,6 +10,7 @@ import pytest
 
 from pytz import timezone
 from halogen import types
+from halogen.exceptions import ValidationError
 
 
 def test_type():
@@ -26,6 +27,14 @@ def test_list():
     value = [object(), object()]
     assert value == type_.serialize(value)
     assert value == type_.deserialize(value)
+
+
+@pytest.mark.parametrize("input", [{"foo": "bar"}, 42, 11.5, True, False, None, "", "foo"])
+def test_list_bad_input(input):
+    """Test that the deserialization fails correctly when the input is not a list, and scalars are not allowed"""
+    type_ = types.List(allow_scalar=False)
+    with pytest.raises(ValidationError, match=".*is not a list"):
+        type_.deserialize(input)
 
 
 @pytest.mark.parametrize(
