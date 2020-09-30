@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.7.0
+-----
+
+* Fix `List` type raising unrelated errors (or no error at all, when passing a dictionary) when deserializing objects that are not lists.
+
+
 1.6.1
 -----
 

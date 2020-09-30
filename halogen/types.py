@@ -64,8 +64,11 @@ class List(Type):
 
     def deserialize(self, value, **kwargs):
         """Deserialize every item of the list."""
-        if self.allow_scalar and not isinstance(value, (list, tuple)):
-            value = [value]
+        if not isinstance(value, (list, tuple)):
+            if self.allow_scalar:
+                value = [value]
+            else:
+                raise ValidationError('"{}" is not a list'.format(value))
         value = super(List, self).deserialize(value)
         result = []
         errors = []

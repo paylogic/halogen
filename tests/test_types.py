@@ -10,6 +10,7 @@ import pytest
 
 from pytz import timezone
 from halogen import types
+from halogen.exceptions import ValidationError
 
 
 def test_type():
@@ -26,6 +27,14 @@ def test_list():
     value = [object(), object()]
     assert value == type_.serialize(value)
     assert value == type_.deserialize(value)
+
+
+@pytest.mark.parametrize("input", [{"foo": "bar"}, 42, 11.5, True, False, None, "", "foo"])
+def test_list_bad_input(input):
+    """Test that the deserialization fails correctly when the input is not a list, and scalars are not allowed"""
+    type_ = types.List(allow_scalar=False)
+    with pytest.raises(ValidationError, match=".*is not a list"):
+        type_.deserialize(input)
 
 
 @pytest.mark.parametrize(
@@ -60,9 +69,7 @@ def test_isoutcdatetime_bc():
     assert type_.deserialize("1799-12-31T23:00:00Z") == value.replace(microsecond=0)
 
 
-@pytest.mark.parametrize(
-    "value", ["01.01.1981 11:11:11", "123x3"],
-)
+@pytest.mark.parametrize("value", ["01.01.1981 11:11:11", "123x3"])
 def test_isoutcdatetime_wrong(value):
     """Test iso datetime when wrong value is passed."""
     type_ = types.ISOUTCDateTime()
@@ -178,7 +185,8 @@ def test_amount_serialize():
 def test_nullable_type():
 
     nested_type = mock.MagicMock(
-        serialize=mock.MagicMock(return_value="serialize"), deserialize=mock.MagicMock(return_value="deserialize"),
+        serialize=mock.MagicMock(return_value="serialize"),
+        deserialize=mock.MagicMock(return_value="deserialize"),
     )
 
     nullable = types.Nullable(nested_type)
