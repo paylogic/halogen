@@ -1155,7 +1155,7 @@ vnd.error
 
 The vendor error (application/vnd.error+json) has now been published as an internet draft: draft-vnd-error_
 
-.. _draft-vnd-error: http://nocarrier.co.uk/profiles/vnd.error/
+.. _draft-vnd-error: https://github.com/blongden/vnd.error
 
 This mediatype is attempting to standartise the format in which the problem can be represented to many clients
 so that it can be expressed and understood.
