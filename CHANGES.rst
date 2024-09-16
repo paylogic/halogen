@@ -1,6 +1,15 @@
 Changelog
 =========
 
+2.0.0
+-----
+
+* Added Enum type
+* Added OneOfValidator
+* **Backwards incompatible**: Boolean now nullable
+* Dropped support Python 2
+
+
 1.7.0
 -----
 
