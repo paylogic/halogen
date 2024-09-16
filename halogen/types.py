@@ -175,7 +175,7 @@ class Boolean(Type):
     def serialize(self, value, **kwargs):
         return bool(value) if value is not None else None
 
-    def deserialize(self, value: Union[str, int, bool], **kwargs):
+    def deserialize(self, value: Union[str, int, bool, None], **kwargs):
         if isinstance(value, int):
             value = bool(value) if value == 1 or value == 0 else None
 
@@ -190,8 +190,8 @@ class Boolean(Type):
                 elif str_value == "false":
                     value = False
 
-        if not isinstance(value, bool):
-            raise ValueError("'{val}' is not an 1 or 0 and true or false".format(val=value))
+                if not isinstance(value, bool):
+                    raise ValueError("'{val}' is not an 1 or 0 and true or false".format(val=value))
 
         return super().deserialize(value, **kwargs)
 
