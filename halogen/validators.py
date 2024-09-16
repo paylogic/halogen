@@ -1,4 +1,6 @@
 """Halogen basic type validators."""
+from abc import abstractmethod
+from typing import Iterable
 
 from halogen import exceptions
 
@@ -7,8 +9,8 @@ class Validator(object):
 
     """Base validator."""
 
-    @classmethod
-    def validate(cls, value):
+    @abstractmethod
+    def validate(cls, value) -> bool:
         """Validate the value.
 
         :param value: Value to validate.
@@ -33,7 +35,7 @@ class LessThanEqual(Validator):
         if value_err is not None:
             self.value_err = value_err
 
-    def validate(self, value):
+    def validate(self, value) -> bool:
         compare_value = self.value() if callable(self.value) else self.value
         if value > compare_value:
             raise exceptions.ValidationError(self.value_err.format(value, compare_value))
@@ -57,7 +59,7 @@ class GreatThanEqual(Validator):
         if value_err is not None:
             self.value_err = value_err
 
-    def validate(self, value):
+    def validate(self, value) -> bool:
         compare_value = self.value() if callable(self.value) else self.value
         if value < compare_value:
             raise exceptions.ValidationError(self.value_err.format(value, compare_value))
@@ -89,7 +91,7 @@ class Length(Validator):
         if max_err is not None:
             self.max_err = max_err
 
-    def validate(self, value):
+    def validate(self, value) -> bool:
         """Validate the length of a list.
 
         :param value: List of values.
@@ -111,6 +113,8 @@ class Length(Validator):
             max_length = self.max_length() if callable(self.max_length) else self.max_length
             if length > max_length:
                 raise exceptions.ValidationError(self.max_err.format(max_length))
+
+        return True
 
 
 class Range(object):
@@ -140,7 +144,7 @@ class Range(object):
         if max_err is not None:
             self.max_err = max_err
 
-    def validate(self, value):
+    def validate(self, value) -> bool:
         """Validate value.
 
         :param value: Value which should be validated.
@@ -157,3 +161,18 @@ class Range(object):
             max_value = self.max() if callable(self.max) else self.max
             if value > max_value:
                 raise exceptions.ValidationError(self.max_err.format(val=value, max=max_value))
+
+        return True
+
+
+class OneOfValidator(Validator):
+    """Check that the value (or values) is among the list of available values"""
+
+    def __init__(self, choices: Iterable):
+        self.choices = set(choices)
+
+    def validate(self, value) -> bool:
+        if value not in self.choices:
+            raise exceptions.ValidationError(f'"{value}" is not a valid choice')
+        return True
+

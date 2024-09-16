@@ -1,6 +1,8 @@
 """Halogen basic types."""
 import datetime
 import decimal
+import enum
+from typing import Union
 
 import dateutil.parser
 import isodate
@@ -173,21 +175,25 @@ class Boolean(Type):
     def serialize(self, value, **kwargs):
         return bool(value) if value is not None else None
 
-    def deserialize(self, value, **kwargs):
-        try:
-            value = int(value)
+    def deserialize(self, value: Union[str, int, bool], **kwargs):
+        if isinstance(value, int):
             value = bool(value) if value == 1 or value == 0 else None
-        except ValueError:
-            str_value = str(value).lower()
-            if str_value == "true":
-                value = True
-            elif str_value == "false":
-                value = False
+
+        if isinstance(value, str):
+            try:
+                value = int(value)
+                value = bool(value) if value == 1 or value == 0 else None
+            except ValueError:
+                str_value = str(value).lower()
+                if str_value == "true":
+                    value = True
+                elif str_value == "false":
+                    value = False
 
         if not isinstance(value, bool):
             raise ValueError("'{val}' is not an 1 or 0 and true or false".format(val=value))
 
-        return value
+        return super().deserialize(value, **kwargs)
 
 
 class Amount(Type):
@@ -280,7 +286,7 @@ class Amount(Type):
 class Nullable(Type):
     """Nullable type."""
 
-    def __init__(self, nested_type, *args, **kwargs):
+    def __init__(self, nested_type: Type, *args, **kwargs):
         self.nested_type = nested_type
         super(Nullable, self).__init__(*args, **kwargs)
 
@@ -293,3 +299,36 @@ class Nullable(Type):
         if value is None:
             return None
         return self.nested_type.deserialize(value, **kwargs)
+
+
+class Enum(Type):
+    """Enum schema type for enum.Enum."""
+
+    def __init__(
+        self,
+        enum_type: type[enum.Enum],
+        use_values: bool = False,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        if not issubclass(enum_type, enum.Enum):
+            raise TypeError("PythonEnum schema only support enum.Enum.")
+        self.enum_type = enum_type
+        self.use_values = use_values
+
+    def serialize(self, value, **kwargs):
+        if self.use_values:
+            return value.value
+
+        return value.name
+
+    def deserialize(self, value: str, **kwargs):
+        try:
+            if self.use_values:
+                value = next(item for item in self.enum_type if item.value == value)
+            else:
+                value = next(item for item in self.enum_type if item.name == value)
+            return super().deserialize(value, **kwargs)
+        except StopIteration:
+            raise ValueError("Unknown value.")
