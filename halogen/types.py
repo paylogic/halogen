@@ -2,7 +2,7 @@
 import datetime
 import decimal
 import enum
-from typing import Union
+from typing import Union, Optional
 
 import dateutil.parser
 import isodate
@@ -317,13 +317,16 @@ class Enum(Type):
         self.enum_type = enum_type
         self.use_values = use_values
 
-    def serialize(self, value, **kwargs):
+    def serialize(self, value: enum.Enum, **kwargs):
         if self.use_values:
             return value.value
 
         return value.name
 
-    def deserialize(self, value: str, **kwargs):
+    def deserialize(self, value: Optional[str], **kwargs):
+        if value is None:
+            return None
+
         try:
             if self.use_values:
                 value = next(item for item in self.enum_type if item.value == value)

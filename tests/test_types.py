@@ -1,6 +1,8 @@
 """Test halogen types."""
 import decimal
 import datetime
+import enum
+from typing import Union
 
 import pytz
 import six
@@ -199,3 +201,55 @@ def test_nullable_type():
 
     assert nullable.deserialize("test") == "deserialize"
     assert nullable.deserialize(None) is None
+
+
+@pytest.mark.parametrize(
+    ["value", "use_values"],
+    [
+        (1, True),
+        ("FOO", False),
+        ("BAR", False),
+    ],
+)
+def test_enum(value: Union[int, str, None], use_values: bool):
+    class TestEnum(enum.Enum):
+        FOO = 1
+        BAR = 2
+
+    type_ = types.Enum(TestEnum, use_values=use_values)
+
+    assert isinstance(type_.deserialize(value), TestEnum)
+
+
+@pytest.mark.parametrize(
+    ["value", "use_values", "expected_error"],
+    [
+        (1, False, "Unknown value."),
+        (3, True, "Unknown value."),
+        ("FOO", True, "Unknown value."),
+        ("BAR", True, "Unknown value."),
+        ("NONEXISTENT", False, "Unknown value."),
+        (1.5, True, "Unknown value.")
+    ],
+)
+def test_invalid_enum(value: Union[int, str, float], use_values: bool, expected_error: str):
+    class TestEnum(enum.Enum):
+        FOO = 1
+        BAR = 2
+
+    type_ = types.Enum(TestEnum, use_values=use_values)
+
+    with pytest.raises(ValueError) as err:
+        type_.deserialize(value)
+
+    assert expected_error == str(err.value)
+
+
+def test_nullable_enum():
+    class TestEnum(enum.Enum):
+        FOO = 1
+        BAR = 2
+
+    type_ = types.Enum(TestEnum, use_values=False)
+
+    assert type_.deserialize(None) is None
