@@ -115,10 +115,13 @@ def test_int():
         (True, True, True),
         (1, 1, True),
         (0, 0, False),
+        ("1", 1, True),
+        ("0", 0, False),
         ("true", "1", True),
         ("True", "0", True),
         ("false", 0, False),
-        ("False", 0.0, False),
+        ("False", 0, False),
+        (None, None, None),
     ],
 )
 def test_boolean(value, clean_value, expected):

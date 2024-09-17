@@ -165,7 +165,7 @@ class Range(object):
         return True
 
 
-class OneOfValidator(Validator):
+class OneOf(Validator):
     """Check that the value (or values) is among the list of available values"""
 
     def __init__(self, choices: Iterable):

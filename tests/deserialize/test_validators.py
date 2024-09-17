@@ -105,3 +105,23 @@ def test_range(lazy):
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 3})
     assert err.value.errors[0].errors == ["3 is greater than maximum value 2"]
+
+
+def test_one_of():
+    class Schema(halogen.Schema):
+
+        attr = halogen.Attr(
+            halogen.types.Type(
+                validators=[
+                    halogen.validators.OneOf(
+                        [1, 2, 3]
+                    )
+                ]
+            )
+        )
+
+    with pytest.raises(halogen.exceptions.ValidationError) as err:
+        Schema.deserialize({"attr": 4})
+    assert err.value.errors[0].errors == ['"4" is not a valid choice']
+
+    Schema.deserialize({"attr": 3})
