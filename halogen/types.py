@@ -178,6 +178,8 @@ class Int(Type):
         return super().serialize(int(value), **kwargs)
 
     def deserialize(self, value, **kwargs):
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
         try:
             value = int(value) if value is not None else None
         except ValueError:
