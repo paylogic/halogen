@@ -6,7 +6,7 @@ Changelog
 
 * Added Enum type
 * Added OneOfValidator
-* **Breaking change**: Boolean now nullable instead of returning always true or false you should adapt your code accordingly
+* **Breaking change**: All types are now nullable instead of possibly returning a default or accepting None, you should adapt your code accordingly by using Nullable()
 * Dropped support Python 2
 
 
