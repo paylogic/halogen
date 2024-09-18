@@ -32,8 +32,6 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: Utilities",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -43,5 +41,5 @@ setup(
     packages=["halogen", "halogen.vnd"],
     install_requires=["cached-property", "isodate", "python-dateutil", "pytz", "six"],
     tests_require=["tox"],
-    python_requires="!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+    python_requires=">=3.6",
 )

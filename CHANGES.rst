@@ -6,7 +6,7 @@ Changelog
 
 * Added Enum type
 * Added OneOfValidator
-* **Backwards incompatible**: Boolean now nullable
+* **Breaking change**: Boolean now nullable instead of returning always true or false you should adapt your code accordingly
 * Dropped support Python 2
 
 
