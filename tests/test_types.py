@@ -11,8 +11,10 @@ import mock
 import pytest
 
 from pytz import timezone
-from halogen import types
+
+from halogen import types, Schema, Attr, exceptions
 from halogen.exceptions import ValidationError
+from halogen.types import Type
 
 
 def test_type():
@@ -201,6 +203,42 @@ def test_nullable_type():
 
     assert nullable.deserialize("test") == "deserialize"
     assert nullable.deserialize(None) is None
+
+
+@pytest.mark.parametrize(
+    ["type", "value", "result"],
+    [
+        (types.Boolean(), {"required": True, "optional": True, "non_nullable": True}, {"required": True, "optional": True, "non_nullable": True}),
+        (types.Boolean(), {"required": None, "optional": None, "non_nullable": True}, {"required": None, "optional": None, "non_nullable": True}),
+        (types.Boolean(), {"required": None, "non_nullable": True}, {"required": None, "non_nullable": True}),
+    ],
+)
+def test_nullable_attribute(type: Type, value: dict, result: dict):
+
+    class FooBar(Schema):
+        required = Attr(types.Nullable(type), required=True)
+        optional = Attr(types.Nullable(type), required=False)
+        non_nullable = Attr(type, required=False)
+
+    assert FooBar.deserialize(value) == result
+
+
+@pytest.mark.parametrize(
+    ["type", "value"],
+    [
+        (types.Boolean(), {"non_nullable": True}),
+        (types.Boolean(), {"required": True, "non_nullable": None}),
+    ],
+)
+def test_failing_nullable_attribute(type: Type, value: dict):
+
+    class FooBar(Schema):
+        required = Attr(types.Nullable(type), required=True)
+        optional = Attr(types.Nullable(type), required=False)
+        non_nullable = Attr(type, required=False)
+
+    with pytest.raises(ValidationError):
+        FooBar.deserialize(value)
 
 
 @pytest.mark.parametrize(

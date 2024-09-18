@@ -2,7 +2,7 @@
 import datetime
 import decimal
 import enum
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 import dateutil.parser
 import isodate
@@ -62,10 +62,15 @@ class List(Type):
 
     def serialize(self, value, **kwargs):
         """Serialize every item of the list."""
-        return [self.item_type.serialize(val, **kwargs) for val in value]
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+        return super().serialize([self.item_type.serialize(val, **kwargs) for val in value], **kwargs)
 
     def deserialize(self, value, **kwargs):
         """Deserialize every item of the list."""
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+
         if not isinstance(value, (list, tuple)):
             if self.allow_scalar:
                 value = [value]
@@ -83,7 +88,7 @@ class List(Type):
                 errors.append(exc)
         if errors:
             raise ValidationError(errors)
-        return result
+        return super().deserialize(result, **kwargs)
 
 
 class ISODateTime(Type):
@@ -93,7 +98,10 @@ class ISODateTime(Type):
     message = u"'{val}' is not a valid ISO-8601 datetime"
 
     def serialize(self, value, **kwargs):
-        return value.isoformat() if value else None
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+
+        return super().serialize(value.isoformat(), **kwargs)
 
     def deserialize(self, value, **kwargs):
         value = value() if callable(value) else value
@@ -121,9 +129,15 @@ class ISOUTCDateTime(Type):
         return value.isoformat().replace("+00:00", "Z")
 
     def serialize(self, value, **kwargs):
-        return self.format_as_utc(value) if value else None
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+
+        return super().serialize(self.format_as_utc(value), **kwargs)
 
     def deserialize(self, value, **kwargs):
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+
         value = value() if callable(value) else value
         try:
             dateutil.parser.parse(value)
@@ -145,21 +159,23 @@ class String(Type):
     """String schema type."""
 
     def serialize(self, value, **kwargs):
-        if value:
-            return six.text_type(super(String, self).serialize(value))
-        return ""
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+        return super().serialize(six.text_type(value), **kwargs)
 
     def deserialize(self, value, **kwargs):
-        if value is not None:
-            return super(String, self).deserialize(six.text_type(value))
-        return ""
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+        return super(String, self).deserialize(six.text_type(value), **kwargs)
 
 
 class Int(Type):
     """Int schema type."""
 
     def serialize(self, value, **kwargs):
-        return int(value) if value is not None else None
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+        return super().serialize(int(value), **kwargs)
 
     def deserialize(self, value, **kwargs):
         try:
@@ -173,9 +189,14 @@ class Boolean(Type):
     """Boolean schema type."""
 
     def serialize(self, value, **kwargs):
-        return bool(value) if value is not None else None
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+        return super().serialize(bool(value), **kwargs)
 
     def deserialize(self, value: Union[str, int, bool, None], **kwargs):
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+
         if isinstance(value, int):
             value = bool(value) if value in (0, 1) else None
 
@@ -211,7 +232,7 @@ class Amount(Type):
         self.amount_class = amount_class
         super(Amount, self).__init__(**kwargs)
 
-    def amount_object_to_dict(self, amount):
+    def amount_object_to_dict(self, amount) -> dict[str, str]:
         """Return the dictionary representation of an Amount object.
 
         Amount object must have amount and currency properties and as_tuple method which will return (currency, amount)
@@ -241,8 +262,9 @@ class Amount(Type):
         :return: Converted amount.
         """
         if value is None:
-            return None
-        return self.amount_object_to_dict(value)
+            raise ValueError("None passed, use Nullable type for nullable values")
+
+        return super().serialize(self.amount_object_to_dict(value), **kwargs)
 
     def deserialize(self, value, **kwargs):
         """Deserialize the amount.
@@ -255,7 +277,7 @@ class Amount(Type):
         :raises ValidationError: when amount has more than 2 decimal places
         """
         if value is None:
-            return None
+            raise ValueError("None passed, use Nullable type for nullable values")
 
         if isinstance(value, six.string_types):
             currency = value[:3]
@@ -290,12 +312,12 @@ class Nullable(Type):
         self.nested_type = nested_type
         super(Nullable, self).__init__(*args, **kwargs)
 
-    def serialize(self, value, **kwargs):
+    def serialize(self, value: Optional[Any], **kwargs):
         if value is None:
             return None
         return self.nested_type.serialize(value, **kwargs)
 
-    def deserialize(self, value, **kwargs):
+    def deserialize(self, value: Optional[Any], **kwargs):
         if value is None:
             return None
         return self.nested_type.deserialize(value, **kwargs)
@@ -317,15 +339,19 @@ class Enum(Type):
         self.enum_type = enum_type
         self.use_values = use_values
 
-    def serialize(self, value: enum.Enum, **kwargs):
-        if self.use_values:
-            return value.value
+    def serialize(self, value: Optional[enum.Enum], **kwargs):
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
 
-        return value.name
+        if self.use_values:
+            value = value.value
+        else:
+            value = value.name
+        return super().serialize(value, **kwargs)
 
     def deserialize(self, value: Optional[str], **kwargs):
         if value is None:
-            return None
+            raise ValueError("None passed, use Nullable type for nullable values")
 
         try:
             if self.use_values:
