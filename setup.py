@@ -37,6 +37,8 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     packages=["halogen", "halogen.vnd"],
     install_requires=["cached-property", "isodate", "python-dateutil", "pytz", "six"],
