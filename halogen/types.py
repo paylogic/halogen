@@ -56,7 +56,7 @@ class List(Type):
         :param item_type: Item type or schema.
         :param allow_scalar: Automatically convert scalar value to the list.
         """
-        super(List, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.item_type = item_type or Type()
         self.allow_scalar = allow_scalar
 
@@ -76,7 +76,7 @@ class List(Type):
                 value = [value]
             else:
                 raise ValidationError('"{}" is not a list'.format(value))
-        value = super(List, self).deserialize(value)
+        value = super().deserialize(value)
         result = []
         errors = []
 
@@ -111,7 +111,7 @@ class ISODateTime(Type):
         except (isodate.ISO8601Error, ValueError):
             raise ValueError(self.message.format(val=value))
 
-        return super(ISODateTime, self).deserialize(value)
+        return super().deserialize(value)
 
 
 class ISOUTCDateTime(Type):
@@ -145,7 +145,7 @@ class ISOUTCDateTime(Type):
         except (isodate.ISO8601Error, ValueError):
             raise ValueError(self.message.format(val=value))
 
-        return super(ISOUTCDateTime, self).deserialize(value)
+        return super().deserialize(value)
 
 
 class ISOUTCDate(ISOUTCDateTime):
@@ -166,7 +166,7 @@ class String(Type):
     def deserialize(self, value, **kwargs):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
-        return super(String, self).deserialize(six.text_type(value), **kwargs)
+        return super().deserialize(six.text_type(value), **kwargs)
 
 
 class Int(Type):
@@ -181,10 +181,10 @@ class Int(Type):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
         try:
-            value = int(value) if value is not None else None
+            value = int(value)
         except ValueError:
             raise ValueError(u"'{val}' is not an integer".format(val=value))
-        return super(Int, self).deserialize(value, **kwargs)
+        return super().deserialize(value, **kwargs)
 
 
 class Boolean(Type):
@@ -200,21 +200,22 @@ class Boolean(Type):
             raise ValueError("None passed, use Nullable type for nullable values")
 
         if isinstance(value, int):
-            value = bool(value) if value in (0, 1) else None
+            if value not in (0, 1):
+                raise ValueError("'{val}' is not 1 or 0".format(val=value))
+            value = bool(value)
 
         if isinstance(value, str):
-            try:
-                value = int(value)
-                value = bool(value) if value in (0, 1) else None
-            except ValueError:
-                str_value = str(value).lower()
-                if str_value == "true":
-                    value = True
-                elif str_value == "false":
-                    value = False
+            str_value = str(value).lower()
+            if str_value not in ("0", "1", "true", "false"):
+                raise ValueError("'{val}' is not 1, 0, true or false".format(val=value))
 
-                if not isinstance(value, bool):
-                    raise ValueError("'{val}' is not 1, 0, true or false".format(val=value))
+            if str_value == "true":
+                value = True
+            elif str_value == "false":
+                value = False
+            else:
+                value = int(str_value)
+                value = bool(value)
 
         return super().deserialize(value, **kwargs)
 
@@ -232,7 +233,7 @@ class Amount(Type):
         """
         self.currencies = currencies
         self.amount_class = amount_class
-        super(Amount, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def amount_object_to_dict(self, amount) -> dict[str, str]:
         """Return the dictionary representation of an Amount object.
@@ -304,7 +305,7 @@ class Amount(Type):
             raise ValueError(u"'{amount}' has more than 2 decimal places.".format(amount=amount))
 
         value = self.amount_class(currency=currency, amount=amount)
-        return super(Amount, self).deserialize(value)
+        return super().deserialize(value)
 
 
 class Nullable(Type):
@@ -312,7 +313,7 @@ class Nullable(Type):
 
     def __init__(self, nested_type: Type, *args, **kwargs):
         self.nested_type = nested_type
-        super(Nullable, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def serialize(self, value: Optional[Any], **kwargs):
         if value is None:
@@ -337,7 +338,7 @@ class Enum(Type):
     ):
         super().__init__(*args, **kwargs)
         if not issubclass(enum_type, enum.Enum):
-            raise TypeError("PythonEnum schema only support enum.Enum.")
+            raise TypeError("Must be subclass of enum.Enum.")
         self.enum_type = enum_type
         self.use_values = use_values
 
@@ -345,21 +346,20 @@ class Enum(Type):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
 
-        if self.use_values:
-            value = value.value
-        else:
-            value = value.name
+        value = value.value if self.use_values else value.name
+
         return super().serialize(value, **kwargs)
 
     def deserialize(self, value: Optional[str], **kwargs):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
 
-        try:
-            if self.use_values:
-                value = next(item for item in self.enum_type if item.value == value)
-            else:
+        if self.use_values:
+            value = self.enum_type(value)
+        else:
+            try:
                 value = next(item for item in self.enum_type if item.name == value)
-            return super().deserialize(value, **kwargs)
-        except StopIteration:
-            raise ValueError("Unknown value.")
+            except KeyError:
+                raise ValueError(f"Unknown enum key: {value}")
+
+        return super().deserialize(value, **kwargs)
