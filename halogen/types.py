@@ -358,7 +358,7 @@ class Enum(Type):
             value = self.enum_type(value)
         else:
             try:
-                value = next(item for item in self.enum_type if item.name == value)
+                value = self.enum_type[value]
             except KeyError:
                 raise ValueError(f"Unknown enum key: {value}")
 
