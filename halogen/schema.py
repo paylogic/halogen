@@ -166,6 +166,10 @@ class Attr(object):
     def _attr_type_serialize_argspec(self):
         return getargspec(self.attr_type.serialize)
 
+    def _default(self):
+        """The value of default"""
+        return self.default() if callable(self.default) else self.default
+
     def serialize(self, value, **kwargs):
         """Serialize the attribute of the input data.
 
@@ -183,9 +187,10 @@ class Attr(object):
             except (AttributeError, KeyError):
                 if not hasattr(self, "default") and self.required:
                     raise
-                value = self.default() if callable(self.default) else self.default
+                value = self._default()
 
-            return self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
+            value = self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
+            return self._default() if value is None and hasattr(self, "default") else value
 
         return self.attr_type
 
@@ -213,7 +218,8 @@ class Attr(object):
                 raise
             return self.default() if callable(self.default) else self.default
 
-        return self.attr_type.deserialize(value, **kwargs)
+        value = self.attr_type.deserialize(value, **kwargs)
+        return self._default() if value is None and hasattr(self, "default") else value
 
     def __repr__(self):
         """Attribute representation."""
