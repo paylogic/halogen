@@ -74,11 +74,11 @@ class Accessor(object):
 
         assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
 
+        if obj is None:
+            # If obj is None (could be Nullable), just return None
+            return None
+
         for attr in self.getter.split("."):
-            if obj is None:
-                # If obj ever becomes None do not try access attribute
-                return None
-            
             if isinstance(obj, dict):
                 obj = obj[attr]
             else:
