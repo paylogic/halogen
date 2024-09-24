@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import halogen
-import six
 
 
 class Error(Exception):
@@ -34,13 +33,13 @@ class Error(Exception):
                 if error.attr is not None:
                     path += error.attr
                 elif error.index is not None:
-                    path += six.text_type(error.index)
+                    path += str(error.index)
 
                 for e in error.errors:
                     flatten(e, path)
             else:
                 if isinstance(error, Exception):
-                    message = six.text_type(error)
+                    message = str(error)
                 else:
                     message = error
                 # TODO: i18n
