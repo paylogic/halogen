@@ -430,7 +430,11 @@ class _Schema(types.Type):
             if attr.compartment is not None:
                 compartment = result.setdefault(attr.compartment, OrderedDict())
             try:
-                compartment[attr.key] = attr.serialize(value, **kwargs)
+                sub_value = attr.serialize(value, **kwargs)
+                if sub_value is None and not attr.required:
+                    # If not required and the value is None, do not add the key to the result
+                    continue
+                compartment[attr.key] = sub_value
             except (AttributeError, KeyError):
                 if attr.required:
                     raise
