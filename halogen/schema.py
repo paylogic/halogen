@@ -1,13 +1,14 @@
 """Halogen schema primitives."""
 import inspect
 from collections import OrderedDict, namedtuple
+from typing import Iterable
 
 from cached_property import cached_property
 import six
 
 from halogen import types
 from halogen import exceptions
-
+from halogen.exceptions import ExcludedValueException
 
 if not six.PY2:  # pragma: no cover
     string_types = (str,)
@@ -127,7 +128,7 @@ class Attr(object):
 
     creation_counter = 0
 
-    def __init__(self, attr_type=None, attr=None, required=True, **kwargs):
+    def __init__(self, attr_type=None, attr=None, required: bool = True, exclude: Iterable = [], **kwargs):
         """Attribute constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -137,6 +138,7 @@ class Attr(object):
         self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required
+        self.exclude = exclude
 
         if "default" in kwargs:
             self.default = kwargs["default"]
@@ -197,7 +199,10 @@ class Attr(object):
                 value = self._default()
 
             value = self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
-            return self._default() if value is None and hasattr(self, "default") else value
+            value = self._default() if value is None and hasattr(self, "default") else value
+            if value in self.exclude:
+                raise ExcludedValueException()
+            return value
 
         return self.attr_type
 
@@ -430,14 +435,12 @@ class _Schema(types.Type):
             if attr.compartment is not None:
                 compartment = result.setdefault(attr.compartment, OrderedDict())
             try:
-                sub_value = attr.serialize(value, **kwargs)
-                if sub_value is None and not attr.required:
-                    # If not required and the value is None, do not add the key to the result
-                    continue
-                compartment[attr.key] = sub_value
+                compartment[attr.key] = attr.serialize(value, **kwargs)
             except (AttributeError, KeyError):
                 if attr.required:
                     raise
+            except ExcludedValueException:
+                pass
             if attr.compartment is not None and len(compartment) == 0:
                 del result[attr.compartment]
         return result

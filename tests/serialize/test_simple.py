@@ -88,22 +88,24 @@ def test_context():
     assert error == {"message": "Ongeldig e-mailadres"}
 
 
-def test_empty_non_required_field():
+def test_exclude_on_attribute():
     class FooBar(halogen.Schema):
 
-        foo_1 = halogen.Attr(required=False)
+        foo_1 = halogen.Attr(required=False, exclude=(None,))
 
-        foo_2 = halogen.Attr(default=1, required=False)
+        foo_2 = halogen.Attr(default=1, required=False, exclude=(None,))
 
-        foo_3 = halogen.Attr(attr=lambda _:1, required=False)
+        foo_3 = halogen.Attr(attr=lambda _:1, required=False, exclude=(None,))
 
-        foo_4 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=False)
+        foo_4 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=False, exclude=(None,))
 
-        required_bar_1 = halogen.Attr(required=True)
+        foo_5 = halogen.Attr(default=1, required=False, exclude=(None, 1))
 
-        required_bar_2 = halogen.Attr(default=1, required=True)
+        required_bar_1 = halogen.Attr(required=True, exclude=(None,))
 
-        required_bar_3 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=True)
+        required_bar_2 = halogen.Attr(default=1, required=True, exclude=(None,))
+
+        required_bar_3 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=True, exclude=(None,))
 
     data = FooBar.serialize({
         "foo_1": None,
@@ -118,6 +120,7 @@ def test_empty_non_required_field():
     assert data["foo_2"] == 1
     assert data["foo_3"] == 1
     assert "foo_4" not in data
-    assert data["required_bar_1"] is None
+    assert "foo_5" not in data
+    assert "required_bar_1" not in data
     assert data["required_bar_2"] == 1
-    assert data["required_bar_3"] is None
+    assert "required_bar_3" not in data

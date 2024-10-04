@@ -41,3 +41,7 @@ class ValidationError(Exception):
 
     def __str__(self):
         return json.dumps(self.to_dict())
+
+
+class ExcludedValueException(Exception):
+    ...
