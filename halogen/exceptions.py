@@ -44,4 +44,4 @@ class ValidationError(Exception):
 
 
 class ExcludedValueException(Exception):
-    ...
+    """Value was explicitly excluded, on serialize exclude this key"""

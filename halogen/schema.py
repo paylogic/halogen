@@ -1,7 +1,7 @@
 """Halogen schema primitives."""
 import inspect
 from collections import OrderedDict, namedtuple
-from typing import Iterable
+from typing import Iterable, Optional
 
 from cached_property import cached_property
 import six
@@ -128,13 +128,16 @@ class Attr(object):
 
     creation_counter = 0
 
-    def __init__(self, attr_type=None, attr=None, required: bool = True, exclude: Iterable = [], **kwargs):
+    def __init__(self, attr_type=None, attr=None, required: bool = True, exclude: Optional[Iterable] = None, **kwargs):
         """Attribute constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param required: Is attribute required to be present.
         """
+        if exclude is None:
+            exclude = []
+
         self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required

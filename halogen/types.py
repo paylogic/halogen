@@ -10,6 +10,7 @@ import pytz
 import six
 
 from .exceptions import ValidationError
+from .schema import _Schema
 
 
 class Type(object):
@@ -311,7 +312,7 @@ class Amount(Type):
 class Nullable(Type):
     """Nullable type."""
 
-    def __init__(self, nested_type: Type, *args, **kwargs):
+    def __init__(self, nested_type: Union[type[Type], Type, _Schema], *args, **kwargs):
         self.nested_type = nested_type
         super().__init__(*args, **kwargs)
 
