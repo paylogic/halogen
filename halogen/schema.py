@@ -135,13 +135,10 @@ class Attr(object):
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param required: Is attribute required to be present.
         """
-        if exclude is None:
-            exclude = []
-
         self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required
-        self.exclude = exclude
+        self.exclude = [] if exclude is None else exclude
 
         if "default" in kwargs:
             self.default = kwargs["default"]
