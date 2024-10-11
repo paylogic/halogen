@@ -4,17 +4,10 @@ from collections import OrderedDict, namedtuple
 from typing import Iterable, Optional
 
 from cached_property import cached_property
-import six
 
 from halogen import types
 from halogen import exceptions
 from halogen.exceptions import ExcludedValueException
-
-if not six.PY2:  # pragma: no cover
-    string_types = (str,)
-else:  # pragma: no cover
-    string_types = (str, unicode)
-
 
 def BYPASS(value):
     """Bypass getter."""
@@ -24,18 +17,9 @@ def BYPASS(value):
 ArgSpec = namedtuple("ArgSpec", ["args", "has_kwargs"])
 
 
-if six.PY2:
-
-    def getargspec(function):
-        spec = inspect.getargspec(function)
-        return ArgSpec(args=spec.args, has_kwargs=spec.keywords is not None)
-
-
-else:
-
-    def getargspec(function):
-        spec = inspect.getfullargspec(function)
-        return ArgSpec(args=spec.args + spec.kwonlyargs, has_kwargs=spec.varkw is not None)
+def getargspec(function):
+    spec = inspect.getfullargspec(function)
+    return ArgSpec(args=spec.args + spec.kwonlyargs, has_kwargs=spec.varkw is not None)
 
 
 def _get_context(argspec, kwargs):
@@ -73,7 +57,7 @@ class Accessor(object):
         if callable(self.getter):
             return self.getter(obj, **_get_context(self._getter_argspec, kwargs))
 
-        assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
+        assert isinstance(self.getter, str), "Accessor must be a function or a dot-separated string."
 
         if obj is None:
             return None
@@ -103,7 +87,7 @@ class Accessor(object):
         if callable(self.setter):
             return self.setter(obj, value)
 
-        assert isinstance(self.setter, string_types), "Accessor must be a function or a dot-separated string."
+        assert isinstance(self.setter, str), "Accessor must be a function or a dot-separated string."
 
         def _set(obj, attr, value):
             if isinstance(obj, dict):

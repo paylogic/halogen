@@ -7,7 +7,6 @@ from typing import Union, Optional, Any
 import dateutil.parser
 import isodate
 import pytz
-import six
 
 from .exceptions import ValidationError
 from .schema import _Schema
@@ -169,12 +168,12 @@ class String(Type):
     def serialize(self, value, **kwargs):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
-        return super().serialize(six.text_type(value), **kwargs)
+        return super().serialize(str(value), **kwargs)
 
     def deserialize(self, value, **kwargs):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
-        return super().deserialize(six.text_type(value), **kwargs)
+        return super().deserialize(str(value), **kwargs)
 
 
 class Int(Type):
@@ -290,7 +289,7 @@ class Amount(Type):
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             currency = value[:3]
             amount = value[3:]
         elif isinstance(value, dict):

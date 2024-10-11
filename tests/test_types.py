@@ -5,7 +5,6 @@ import enum
 from typing import Union
 
 import pytz
-import six
 
 import mock
 import pytest
@@ -102,7 +101,7 @@ def test_string():
     """Test string type."""
     type_ = types.String()
     value = object()
-    assert type_.serialize(value) == six.text_type(value)
+    assert type_.serialize(value) == str(value)
     with pytest.raises(ValueError):
         type_.serialize(None)
     assert type_.deserialize("") == ""

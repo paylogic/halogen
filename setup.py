@@ -41,7 +41,7 @@ setup(
         "Programming Language :: Python :: 3.12",
     ],
     packages=["halogen", "halogen.vnd"],
-    install_requires=["cached-property", "isodate", "python-dateutil", "pytz", "six"],
+    install_requires=["cached-property", "isodate", "python-dateutil", "pytz"],
     tests_require=["tox"],
     python_requires=">=3.6",
 )
