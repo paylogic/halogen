@@ -1,6 +1,15 @@
 Changelog
 =========
 
+2.0.0
+-----
+
+* Added Enum type
+* Added OneOfValidator
+* **Breaking change**: All types are now non-nullable instead of possibly returning a default or accepting `None`, you should adapt your code accordingly by using `Nullable()`
+* Dropped support Python 2
+
+
 1.7.0
 -----
 

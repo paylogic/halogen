@@ -86,3 +86,41 @@ def test_context():
     )
 
     assert error == {"message": "Ongeldig e-mailadres"}
+
+
+def test_exclude_on_attribute():
+    class FooBar(halogen.Schema):
+
+        foo_1 = halogen.Attr(required=False, exclude=(None,))
+
+        foo_2 = halogen.Attr(default=1, required=False, exclude=(None,))
+
+        foo_3 = halogen.Attr(attr=lambda _:1, required=False, exclude=(None,))
+
+        foo_4 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=False, exclude=(None,))
+
+        foo_5 = halogen.Attr(default=1, required=False, exclude=(None, 1))
+
+        required_bar_1 = halogen.Attr(required=True, exclude=(None,))
+
+        required_bar_2 = halogen.Attr(default=1, required=True, exclude=(None,))
+
+        required_bar_3 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=True, exclude=(None,))
+
+    data = FooBar.serialize({
+        "foo_1": None,
+        "foo_2": None,
+        "foo_3": None,
+        "foo_4": None,
+        "required_bar_1": None,
+        "required_bar_2": None,
+        "required_bar_3": None
+    })
+    assert "foo_1" not in data
+    assert data["foo_2"] == 1
+    assert data["foo_3"] == 1
+    assert "foo_4" not in data
+    assert "foo_5" not in data
+    assert "required_bar_1" not in data
+    assert data["required_bar_2"] == 1
+    assert "required_bar_3" not in data

@@ -1,13 +1,14 @@
 """Halogen schema primitives."""
 import inspect
 from collections import OrderedDict, namedtuple
+from typing import Iterable, Optional
 
 from cached_property import cached_property
 import six
 
 from halogen import types
 from halogen import exceptions
-
+from halogen.exceptions import ExcludedValueException
 
 if not six.PY2:  # pragma: no cover
     string_types = (str,)
@@ -74,7 +75,14 @@ class Accessor(object):
 
         assert isinstance(self.getter, string_types), "Accessor must be a function or a dot-separated string."
 
+        if obj is None:
+            return None
+
         for attr in self.getter.split("."):
+            if obj is None:
+                # If obj is None (could be Nullable), just return None
+                return None
+
             if isinstance(obj, dict):
                 obj = obj[attr]
             else:
@@ -120,7 +128,7 @@ class Attr(object):
 
     creation_counter = 0
 
-    def __init__(self, attr_type=None, attr=None, required=True, **kwargs):
+    def __init__(self, attr_type=None, attr=None, required: bool = True, exclude: Optional[Iterable] = None, **kwargs):
         """Attribute constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -130,6 +138,7 @@ class Attr(object):
         self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required
+        self.exclude = [] if exclude is None else exclude
 
         if "default" in kwargs:
             self.default = kwargs["default"]
@@ -166,6 +175,10 @@ class Attr(object):
     def _attr_type_serialize_argspec(self):
         return getargspec(self.attr_type.serialize)
 
+    def _default(self):
+        """The value of default"""
+        return self.default() if callable(self.default) else self.default
+
     def serialize(self, value, **kwargs):
         """Serialize the attribute of the input data.
 
@@ -183,9 +196,13 @@ class Attr(object):
             except (AttributeError, KeyError):
                 if not hasattr(self, "default") and self.required:
                     raise
-                value = self.default() if callable(self.default) else self.default
+                value = self._default()
 
-            return self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
+            value = self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
+            value = self._default() if value is None and hasattr(self, "default") else value
+            if value in self.exclude:
+                raise ExcludedValueException()
+            return value
 
         return self.attr_type
 
@@ -213,7 +230,8 @@ class Attr(object):
                 raise
             return self.default() if callable(self.default) else self.default
 
-        return self.attr_type.deserialize(value, **kwargs)
+        value = self.attr_type.deserialize(value, **kwargs)
+        return self._default() if value is None and hasattr(self, "default") else value
 
     def __repr__(self):
         """Attribute representation."""
@@ -421,6 +439,8 @@ class _Schema(types.Type):
             except (AttributeError, KeyError):
                 if attr.required:
                     raise
+            except ExcludedValueException:
+                pass
             if attr.compartment is not None and len(compartment) == 0:
                 del result[attr.compartment]
         return result
