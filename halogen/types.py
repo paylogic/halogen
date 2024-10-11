@@ -35,8 +35,15 @@ class Type(object):
         :return: Deserialized value.
         :raises: :class:`halogen.exception.ValidationError` exception if value is not valid.
         """
+        validation_exceptions = []
         for validator in self.validators:
-            validator.validate(value, **kwargs)
+            try:
+                validator.validate(value, **kwargs)
+            except ValidationError as e:
+                validation_exceptions.append(e)
+
+        if len(validation_exceptions) > 0:
+            raise ValidationError(validation_exceptions)
 
         return value
 
