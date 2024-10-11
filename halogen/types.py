@@ -2,6 +2,7 @@
 import datetime
 import decimal
 import enum
+import typing
 from typing import Union, Optional, Any
 
 import dateutil.parser
@@ -9,7 +10,9 @@ import isodate
 import pytz
 
 from .exceptions import ValidationError
-from .schema import _Schema
+
+if typing.TYPE_CHECKING:
+    from .schema import _Schema
 
 
 class Type(object):
@@ -318,7 +321,7 @@ class Amount(Type):
 class Nullable(Type):
     """Nullable type."""
 
-    def __init__(self, nested_type: Union[type[Type], Type, _Schema], *args, **kwargs):
+    def __init__(self, nested_type: Union[type[Type], Type, "_Schema"], *args, **kwargs):
         self.nested_type = nested_type
         super().__init__(*args, **kwargs)
 
