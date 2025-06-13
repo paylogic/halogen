@@ -1,13 +1,15 @@
 """Halogen schema primitives."""
 import inspect
 from collections import OrderedDict, namedtuple
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 
 from cached_property import cached_property
 
+import halogen
 from halogen import types
 from halogen import exceptions
-from halogen.exceptions import ExcludedValueException
+from halogen.exceptions import ExcludedValueException, InvalidSchemaDefinition
+
 
 def BYPASS(value):
     """Bypass getter."""
@@ -372,7 +374,7 @@ class Embedded(Attr):
 
     """Embedded attribute of schema."""
 
-    def __init__(self, attr_type=None, attr=None, curie=None, required=True):
+    def __init__(self, attr_type: Union["halogen.Schema", "halogen.types.List"], attr=None, curie=None, required=True):
         """Embedded constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -381,6 +383,7 @@ class Embedded(Attr):
         """
         super(Embedded, self).__init__(attr_type=attr_type, attr=attr, required=required)
         self.curie = curie
+        self.validate()
 
     @property
     def compartment(self):
@@ -393,6 +396,23 @@ class Embedded(Attr):
         if self.curie is None:
             return self.name
         return ":".join((self.curie.name, self.name))
+
+    def validate(self):
+        #Validate self link
+        class_attributes = self.attr_type.__dict__.get("__class_attrs__")
+        if isinstance(self.attr_type, halogen.types.List):
+            class_attributes = self.attr_type.item_type.__dict__.get("__class_attrs__")
+        if class_attributes is not None and "self" not in class_attributes.keys():
+            raise InvalidSchemaDefinition("Invalid HAL standard definition, need `self` link")
+
+        #Validate attr_type of type schema
+        attribute_type = self.attr_type
+        if isinstance(attribute_type, halogen.types.List):
+            attribute_type = attribute_type.item_type
+
+        if not isinstance(attribute_type, halogen.schema._SchemaType):
+            raise InvalidSchemaDefinition("Invalid HAL standard definition, embedded values are either resource objects or list of resource objects")
+
 
 
 class _Schema(types.Type):
