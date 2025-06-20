@@ -11,7 +11,6 @@ Python HAL generation/parsing library.
     :target: https://travis-ci.org/paylogic/halogen
 .. image:: https://readthedocs.org/projects/halogen/badge/?version=latest
     :alt: Documentation Status
-    :scale: 100%
     :target: https://readthedocs.org/projects/halogen/
 
 Halogen takes the advantage of the declarative style serialization with easily extendable schemas.
