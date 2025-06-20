@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.1.0
+-----
+
+* Added Embedded validation
+
+
 2.0.0
 -----
 

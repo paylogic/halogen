@@ -398,21 +398,18 @@ class Embedded(Attr):
         return ":".join((self.curie.name, self.name))
 
     def validate(self):
-        #Validate self link
-        class_attributes = self.attr_type.__dict__.get("__class_attrs__")
-        if isinstance(self.attr_type, halogen.types.List):
-            class_attributes = self.attr_type.item_type.__dict__.get("__class_attrs__")
-        if class_attributes is not None and "self" not in class_attributes.keys():
-            raise InvalidSchemaDefinition("Invalid HAL standard definition, need `self` link")
-
-        #Validate attr_type of type schema
         attribute_type = self.attr_type
         if isinstance(attribute_type, halogen.types.List):
             attribute_type = attribute_type.item_type
 
+        #Validate attr_type of type schema
         if not isinstance(attribute_type, halogen.schema._SchemaType):
             raise InvalidSchemaDefinition("Invalid HAL standard definition, embedded values are either resource objects or list of resource objects")
 
+        #Validate self link
+        class_attributes = attribute_type.__dict__.get("__class_attrs__")
+        if class_attributes is not None and "self" not in class_attributes.keys():
+            raise InvalidSchemaDefinition("Invalid HAL standard definition, need `self` link")
 
 
 class _Schema(types.Type):
