@@ -68,4 +68,4 @@ class VNDError(halogen.Schema):
     logref = halogen.Attr(required=False)
     path = halogen.Attr(required=False)
 
-    errors = halogen.Embedded(List(), required=False)
+    errors = halogen.Attr(List(), required=False)

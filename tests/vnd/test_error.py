@@ -60,4 +60,4 @@ def test_validation():
         dict(path="/year", message=u"'☃bc' is not an integer"),
     ]
 
-    assert data["_embedded"]["errors"] == expected_errors
+    assert data["errors"] == expected_errors

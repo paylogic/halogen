@@ -8,7 +8,6 @@ import halogen
 
 
 class Amount(object):
-
     """A combination of currency and amount."""
 
     def __init__(self, currency, amount):
@@ -18,7 +17,6 @@ class Amount(object):
 
 
 class Person(object):
-
     """A person has a name and surname."""
 
     def __init__(self, name, surname):
@@ -28,7 +26,6 @@ class Person(object):
 
 
 class Event(object):
-
     """A event has a name."""
 
     def __init__(self, name):
@@ -37,7 +34,6 @@ class Event(object):
 
 
 class AmountType(halogen.types.Type):
-
     """A type that matches the Amount class."""
 
     @classmethod
@@ -50,22 +46,27 @@ em = halogen.Curie(name="em", href="https://docs.event-manager.com/{rel}.html", 
 
 
 class PersonSchema(halogen.Schema):
-
     """A schema that matches the Person class."""
+
+    @halogen.Link()
+    def self(self):
+        return "/foobar/1"
 
     name = halogen.Attr()
     surname = halogen.Attr()
 
 
 class EventSchema(halogen.Schema):
-
     """A schema that matches the Event class."""
+
+    @halogen.Link()
+    def self(self):
+        return "/foobar/1"
 
     name = halogen.Attr()
 
 
 class NestedSchema(halogen.Schema):
-
     """A combination of a Person, an attribute is_friend, and a price."""
 
     self = halogen.Link("/events/activity-event{?uid}", type="application/pdf", templated=True)
@@ -84,22 +85,26 @@ def test_nested():
         "events": [Event("Name")],
     }
     serialized = NestedSchema.serialize(nested_data)
-    assert serialized == {
-        "person": {"surname": "Smith", "name": "John"},
-        "price": {"currency": "EUR", "amount": "13.37"},
-        "is_friend": True,
-        "_embedded": {"em:events": [{"name": "Name"}]},
+    assert dict(serialized) == {
         "_links": {
+            "self": {
+                "href": "/events/activity-event{?uid}",
+                "templated": True,
+                "type": "application/pdf"
+            },
             "curies": [
                 {
                     "href": "https://docs.event-manager.com/{rel}.html",
-                    "type": "text/html",
                     "name": "em",
                     "templated": True,
+                    "type": "text/html"
                 }
-            ],
-            "self": {"href": "/events/activity-event{?uid}", "type": "application/pdf", "templated": True},
+            ]
         },
+        "person": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": "Smith"},
+        "is_friend": True,
+        "price": {"currency": "EUR", "amount": "13.37"},
+        "_embedded": {"em:events": [{"_links": {"self": {"href": "/foobar/1"}}, "name": "Name"}]}
     }
 
 
@@ -118,10 +123,8 @@ def test_creation_counter():
     }
     serialized = OrderedSchema1.serialize(data)
     rv = json.dumps(serialized)
-    assert rv == (
-        '{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": '
-        '"world", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}'
-    )
+    assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": "world", "_embedded": '
+                  '{"person": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": "Smith"}}}')
 
     class OrderedSchema2(halogen.Schema):
         self = halogen.Link("http://somewhere.com")
@@ -132,8 +135,8 @@ def test_creation_counter():
     serialized = OrderedSchema2.serialize(data)
     rv = json.dumps(serialized)
     assert rv == (
-        '{"_links": {"self": {"href": "http://somewhere.com"}}, "hello": "world", '
-        '"foo": "bar", "_embedded": {"person": {"name": "John", "surname": "Smith"}}}'
+        '{"_links": {"self": {"href": "http://somewhere.com"}}, "hello": "world", "foo": "bar", "_embedded": {'
+        '"person": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": "Smith"}}}'
     )
 
 
@@ -146,4 +149,7 @@ def test_empty_compartment_does_not_appear():
 
     serialized = Schema.serialize({"user2": Person("John", "Smith")})
     rv = json.dumps(serialized)
-    assert rv == '{"_embedded": {"user2": {"name": "John", "surname": "Smith"}}}'
+    assert rv == (
+        '{"_embedded": {"user2": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": '
+        '"Smith"}}}'
+    )
