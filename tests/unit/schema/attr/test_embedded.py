@@ -38,6 +38,9 @@ def test_valid_embedded_validation():
         def self(self):
             return "/foobar/1"
 
+    class NestedEmbeddedReferenceSchema(EmbeddedWithSelfReferenceSchema):
+        name = halogen.Attr(halogen.types.String())
+
     class TestSchema(halogen.Schema):
         embedded_value = halogen.Embedded(EmbeddedWithSelfReferenceSchema)
 

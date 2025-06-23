@@ -407,7 +407,7 @@ class Embedded(Attr):
             raise InvalidSchemaDefinition("Invalid HAL standard definition, embedded values are either resource objects or list of resource objects")
 
         #Validate self link
-        class_attributes = attribute_type.__dict__.get("__class_attrs__")
+        class_attributes = attribute_type.__dict__.get("__attrs__")
         if class_attributes is not None and "self" not in class_attributes.keys():
             raise InvalidSchemaDefinition("Invalid HAL standard definition, need `self` link")
 
