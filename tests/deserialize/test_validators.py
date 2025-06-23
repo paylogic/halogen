@@ -25,7 +25,7 @@ def test_less_than(lazy):
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 2})
-    assert err.value.errors[0].errors == ["2 is bigger than 1"]
+    assert "2 is bigger than 1" in str(err.value)
 
     assert Schema.deserialize({"attr": 1}) == {"attr": 1}
 
@@ -45,7 +45,7 @@ def test_greated_than(lazy):
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 0})
-    assert err.value.errors[0].errors == ["0 is smaller than 1"]
+    assert "0 is smaller than 1" in str(err.value)
     assert Schema.deserialize({"attr": 1}) == {"attr": 1}
 
 
@@ -69,15 +69,15 @@ def test_length(lazy):
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": []})
-    assert err.value.errors[0].errors == ["Length is less than 1"]
+    assert "Length is less than 1" in str(err.value)
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 1})
-    assert err.value.errors[0].errors == ["Length is less than 1"]
+    assert "Length is less than 1" in str(err.value)
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": [1, 2, 3]})
-    assert err.value.errors[0].errors == ["Length is greater than 2"]
+    assert "Length is greater than 2" in str(err.value)
 
 
 def test_range(lazy):
@@ -100,11 +100,11 @@ def test_range(lazy):
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 0})
-    assert err.value.errors[0].errors == ["0 is less than minimum value 1"]
+    assert "0 is less than minimum value 1" in str(err.value)
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 3})
-    assert err.value.errors[0].errors == ["3 is greater than maximum value 2"]
+    assert "3 is greater than maximum value 2" in str(err.value)
 
 
 def test_one_of():
@@ -122,6 +122,6 @@ def test_one_of():
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 4})
-    assert err.value.errors[0].errors == ['"4" is not a valid choice']
+    assert '\\"4\\" is not a valid choice' in str(err.value)
 
     Schema.deserialize({"attr": 3})

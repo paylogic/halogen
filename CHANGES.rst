@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.1.1
+-----
+
+* Hotfix for 2.0.0: Fix VNDError Embedded
+
+
 2.1.0
 -----
 
