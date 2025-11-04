@@ -32,6 +32,24 @@ def test_list():
     assert value == type_.deserialize(value)
 
 
+@pytest.mark.parametrize("type_", [
+    types.List(),
+    types.ISODateTime(),
+    types.ISOUTCDateTime(),
+    types.ISOUTCDate(),
+    types.String(),
+    types.Int(),
+    types.Boolean(),
+    types.Amount(currencies=["EUR"], amount_class=dict),
+    types.Enum(enum.Enum("TestEnum", "FOO BAR"), use_values=False),
+])
+def test_types_none(type_):
+    """Test iso datetime when no value is passed"""
+    with pytest.raises(ValueError) as err:
+        type_.deserialize(None)
+    assert err.value.args[0] == "None passed, use Nullable type for nullable values"
+
+
 @pytest.mark.parametrize("input", [{"foo": "bar"}, 42, 11.5, True, False, "", "foo"])
 def test_list_bad_input(input):
     """Test that the deserialization fails correctly when the input is not a list, and scalars are not allowed"""

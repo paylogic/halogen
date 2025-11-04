@@ -114,6 +114,9 @@ class ISODateTime(Type):
         return super().serialize(value.isoformat(), **kwargs)
 
     def deserialize(self, value, **kwargs):
+        if value is None:
+            raise ValueError("None passed, use Nullable type for nullable values")
+
         value = value() if callable(value) else value
         try:
             dateutil.parser.parse(value)
