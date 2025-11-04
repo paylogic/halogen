@@ -39,7 +39,7 @@ def test_validation():
         BookSchema.deserialize(
             dict(
                 # title is skipped
-                year=u"☃bc",  # Not an integer
+                year="☃bc",  # Not an integer
                 authors=[dict(name="John Smith"), dict()],  # Second author has no name
                 publisher=dict(address="Chasey Lane 42, Los Angeles, US"),  # No name
             ),
@@ -57,7 +57,7 @@ def test_validation():
         dict(path="/authors/1/name", message="Missing attribute."),
         dict(path="/publisher/name", message="Missing attribute."),
         dict(path="/title", message="Missing attribute."),
-        dict(path="/year", message=u"'☃bc' is not an integer"),
+        dict(path="/year", message="'☃bc' is not an integer"),
     ]
 
     assert data["errors"] == expected_errors

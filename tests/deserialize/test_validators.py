@@ -110,15 +110,7 @@ def test_range(lazy):
 def test_one_of():
     class Schema(halogen.Schema):
 
-        attr = halogen.Attr(
-            halogen.types.Type(
-                validators=[
-                    halogen.validators.OneOf(
-                        [1, 2, 3]
-                    )
-                ]
-            )
-        )
+        attr = halogen.Attr(halogen.types.Type(validators=[halogen.validators.OneOf([1, 2, 3])]))
 
     with pytest.raises(halogen.exceptions.ValidationError) as err:
         Schema.deserialize({"attr": 4})

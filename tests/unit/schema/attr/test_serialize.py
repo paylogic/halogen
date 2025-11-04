@@ -1,4 +1,5 @@
 """Tests for the serialize function of Attr."""
+
 import mock
 
 from halogen.schema import Attr, Accessor

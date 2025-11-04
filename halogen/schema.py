@@ -1,4 +1,5 @@
 """Halogen schema primitives."""
+
 import inspect
 from collections import OrderedDict, namedtuple
 from typing import Iterable, Optional, Union
@@ -37,7 +38,6 @@ def _get_context(argspec, kwargs):
 
 
 class Accessor(object):
-
     """Object that encapsulates the getter and the setter of the attribute."""
 
     def __init__(self, getter=None, setter=None):
@@ -124,7 +124,7 @@ class Attr(object):
         self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required
-        self.exclude = [] if exclude is None else exclude
+        self.exclude = [] if exclude is None else list(exclude)
 
         if "default" in kwargs:
             self.default = kwargs["default"]
@@ -256,7 +256,6 @@ def attr(*args, **kwargs):
 
 
 class Link(Attr):
-
     """Link attribute of a schema."""
 
     def __init__(
@@ -333,7 +332,6 @@ class Link(Attr):
 
 
 class LinkList(Link):
-
     """List of links attribute of a schema."""
 
     def __init__(self, attr_type=None, attr=None, required=True, curie=None):
@@ -349,7 +347,6 @@ class LinkList(Link):
 
 
 class Curie(object):
-
     """Curie object."""
 
     def __init__(self, name, href, templated=None, type=None):
@@ -371,7 +368,6 @@ class Curie(object):
 
 
 class Embedded(Attr):
-
     """Embedded attribute of schema."""
 
     def __init__(self, attr_type: Union["halogen.Schema", "halogen.types.List"], attr=None, curie=None, required=True):
@@ -402,18 +398,19 @@ class Embedded(Attr):
         if isinstance(attribute_type, halogen.types.List):
             attribute_type = attribute_type.item_type
 
-        #Validate attr_type of type schema
+        # Validate attr_type of type schema
         if not isinstance(attribute_type, halogen.schema._SchemaType):
-            raise InvalidSchemaDefinition("Invalid HAL standard definition, embedded values are either resource objects or list of resource objects")
+            raise InvalidSchemaDefinition(
+                "Invalid HAL standard definition, embedded values are either resource objects or list of resource objects"
+            )
 
-        #Validate self link
+        # Validate self link
         class_attributes = attribute_type.__dict__.get("__attrs__")
         if class_attributes is not None and "self" not in class_attributes.keys():
             raise InvalidSchemaDefinition("Invalid HAL standard definition, need `self` link")
 
 
 class _Schema(types.Type):
-
     """Type for creating schema."""
 
     def __new__(cls, **kwargs):
@@ -485,7 +482,6 @@ class _Schema(types.Type):
 
 
 class _SchemaType(type):
-
     """A type used to create Schemas."""
 
     def __init__(cls, name, bases, clsattrs):

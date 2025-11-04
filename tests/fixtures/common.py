@@ -1,4 +1,5 @@
 """Simple objects and dicts, that can be used as input for unit-testing functions."""
+
 from collections import namedtuple
 
 import pytest
@@ -26,7 +27,6 @@ def basic_object(basic_object_value):
     """Instance of basic_object."""
 
     class basic_object(object):
-
         """Simple object with one property."""
 
         def __init__(self, value=None):

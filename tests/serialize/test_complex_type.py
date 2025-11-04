@@ -87,24 +87,20 @@ def test_nested():
     serialized = NestedSchema.serialize(nested_data)
     assert dict(serialized) == {
         "_links": {
-            "self": {
-                "href": "/events/activity-event{?uid}",
-                "templated": True,
-                "type": "application/pdf"
-            },
+            "self": {"href": "/events/activity-event{?uid}", "templated": True, "type": "application/pdf"},
             "curies": [
                 {
                     "href": "https://docs.event-manager.com/{rel}.html",
                     "name": "em",
                     "templated": True,
-                    "type": "text/html"
+                    "type": "text/html",
                 }
-            ]
+            ],
         },
         "person": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": "Smith"},
         "is_friend": True,
         "price": {"currency": "EUR", "amount": "13.37"},
-        "_embedded": {"em:events": [{"_links": {"self": {"href": "/foobar/1"}}, "name": "Name"}]}
+        "_embedded": {"em:events": [{"_links": {"self": {"href": "/foobar/1"}}, "name": "Name"}]},
     }
 
 
@@ -123,8 +119,10 @@ def test_creation_counter():
     }
     serialized = OrderedSchema1.serialize(data)
     rv = json.dumps(serialized)
-    assert rv == ('{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": "world", "_embedded": '
-                  '{"person": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": "Smith"}}}')
+    assert rv == (
+        '{"_links": {"self": {"href": "http://somewhere.com"}}, "foo": "bar", "hello": "world", "_embedded": '
+        '{"person": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": "Smith"}}}'
+    )
 
     class OrderedSchema2(halogen.Schema):
         self = halogen.Link("http://somewhere.com")
@@ -150,6 +148,5 @@ def test_empty_compartment_does_not_appear():
     serialized = Schema.serialize({"user2": Person("John", "Smith")})
     rv = json.dumps(serialized)
     assert rv == (
-        '{"_embedded": {"user2": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": '
-        '"Smith"}}}'
+        '{"_embedded": {"user2": {"_links": {"self": {"href": "/foobar/1"}}, "name": "John", "surname": ' '"Smith"}}}'
     )

@@ -12,18 +12,22 @@ def test_invalid_embedded_validation():
         self = halogen.Link()
 
     with pytest.raises(InvalidSchemaDefinition):
+
         class TestSchema(halogen.Schema):
             embedded_value = halogen.Embedded(EmbeddedWithoutSelfReferenceSchema)
 
     with pytest.raises(InvalidSchemaDefinition):
+
         class TestWithInvalidListSchema(halogen.Schema):
             embedded_value = halogen.Embedded(halogen.types.List(halogen.types.String))
 
     with pytest.raises(InvalidSchemaDefinition):
+
         class TestWithEmptyListSchema(halogen.Schema):
             embedded_value = halogen.Embedded(halogen.types.List())
 
     with pytest.raises(InvalidSchemaDefinition):
+
         class TestWithIncorrectValueSchema(halogen.Schema):
             embedded_value = halogen.Embedded(halogen.types.String())
 

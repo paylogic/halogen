@@ -1,4 +1,5 @@
 """Test the serialize function of Schema."""
+
 import mock
 
 import halogen
@@ -9,7 +10,6 @@ def test_schema_calls_attr(attr_serialize):
     """Test that schema serialize calls attr serialize with the correct value."""
 
     class S(halogen.Schema):
-
         """Test schema."""
 
         key = halogen.Attr()
@@ -23,13 +23,11 @@ def test_schema_override_attr(attr_serialize):
     """Test that schema attributes can be overridden."""
 
     class S(halogen.Schema):
-
         """Test schema."""
 
         key = halogen.Attr()
 
     class T(S):
-
         """Test schema."""
 
         key = halogen.Attr()
@@ -42,7 +40,6 @@ def test_schema_override_attr_class():
     """Test that schema attributes can be overridden."""
 
     class S(halogen.Schema):
-
         """Test schema."""
 
         key = halogen.Attr()
@@ -50,7 +47,6 @@ def test_schema_override_attr_class():
     attr = halogen.Attr()
 
     class T(S):
-
         """Test schema."""
 
         key = attr

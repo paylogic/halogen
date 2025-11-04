@@ -1,4 +1,5 @@
 """Test functionality of Halogen when using a complex type."""
+
 import json
 import copy
 from decimal import Decimal, InvalidOperation
@@ -10,7 +11,6 @@ import halogen.types
 
 
 class Amount(halogen.types.Type):
-
     """A combination of currency and amount."""
 
     @classmethod
@@ -24,7 +24,6 @@ class Amount(halogen.types.Type):
 
 
 class Person(halogen.Schema):
-
     """A person has a name and surname."""
 
     name = halogen.Attr()
@@ -32,7 +31,6 @@ class Person(halogen.Schema):
 
 
 class Product(halogen.Schema):
-
     """A product has a name and quantity."""
 
     name = halogen.Attr()
@@ -40,7 +38,6 @@ class Product(halogen.Schema):
 
 
 class NestedSchema(halogen.Schema):
-
     """An example nested schema, with a person, an is_friend attribute, and a price."""
 
     self = halogen.Link(attr="/some/link")

@@ -44,8 +44,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Halogen"
-copyright = u"2013, Oleg Pidsadnyi, Paylogic International and others"
+project = "Halogen"
+copyright = "2013, Oleg Pidsadnyi, Paylogic International and others"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -185,7 +185,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "halogen.tex", u"halogen documentation", u"Oleg Pidsadnyi, Paylogic International and others", "manual"),
+    ("index", "halogen.tex", "halogen documentation", "Oleg Pidsadnyi, Paylogic International and others", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -213,7 +213,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [("index", "halogen", u"halogen documentation", [u"Oleg Pidsadnyi", "Paylogic International", "others"], 1)]
+man_pages = [("index", "halogen", "halogen documentation", ["Oleg Pidsadnyi", "Paylogic International", "others"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -228,8 +228,8 @@ texinfo_documents = [
     (
         "index",
         "halogen",
-        u"halogen documentation",
-        u"Oleg Pidsadnyi, Paylogic International and others",
+        "halogen documentation",
+        "Oleg Pidsadnyi, Paylogic International and others",
         "halogen",
         "Python HAL generation/parsing library.",
         "Miscellaneous",

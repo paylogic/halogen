@@ -1,4 +1,5 @@
 """Test halogen types."""
+
 import decimal
 import datetime
 import enum
@@ -30,6 +31,27 @@ def test_list():
     value = [object(), object()]
     assert value == type_.serialize(value)
     assert value == type_.deserialize(value)
+
+
+@pytest.mark.parametrize(
+    "type_",
+    [
+        types.List(),
+        types.ISODateTime(),
+        types.ISOUTCDateTime(),
+        types.ISOUTCDate(),
+        types.String(),
+        types.Int(),
+        types.Boolean(),
+        types.Amount(currencies=["EUR"], amount_class=dict),
+        types.Enum(enum.Enum("TestEnum", "FOO BAR"), use_values=False),
+    ],
+)
+def test_types_none(type_):
+    """Test iso datetime when no value is passed"""
+    with pytest.raises(ValueError) as err:
+        type_.deserialize(None)
+    assert err.value.args[0] == "None passed, use Nullable type for nullable values"
 
 
 @pytest.mark.parametrize("input", [{"foo": "bar"}, 42, 11.5, True, False, "", "foo"])
@@ -142,7 +164,8 @@ def test_boolean(value, clean_value, expected):
 
 
 @pytest.mark.parametrize(
-    "value", ["not-int", None, "2"],
+    "value",
+    ["not-int", None, "2"],
 )
 def test_boolean_invalid(value):
     """Test boolean type when value provided is not valid."""
@@ -224,8 +247,16 @@ def test_nullable_type():
 @pytest.mark.parametrize(
     ["type", "value", "result"],
     [
-        (types.Boolean(), {"required": True, "optional": True, "non_nullable": True}, {"required": True, "optional": True, "non_nullable": True}),
-        (types.Boolean(), {"required": None, "optional": None, "non_nullable": True}, {"required": None, "optional": None, "non_nullable": True}),
+        (
+            types.Boolean(),
+            {"required": True, "optional": True, "non_nullable": True},
+            {"required": True, "optional": True, "non_nullable": True},
+        ),
+        (
+            types.Boolean(),
+            {"required": None, "optional": None, "non_nullable": True},
+            {"required": None, "optional": None, "non_nullable": True},
+        ),
         (types.Boolean(), {"required": None, "non_nullable": True}, {"required": None, "non_nullable": True}),
     ],
 )
@@ -283,7 +314,7 @@ def test_enum(value: Union[int, str, None], use_values: bool):
         ("FOO", True, "is not a valid"),
         ("BAR", True, "is not a valid"),
         ("NONEXISTENT", False, "Unknown enum key"),
-        (1.5, True, "is not a valid")
+        (1.5, True, "is not a valid"),
     ],
 )
 def test_invalid_enum(value: Union[int, str, float], use_values: bool, expected_error: str):
@@ -306,3 +337,10 @@ def test_nullable_enum():
 
     with pytest.raises(ValueError):
         type_.serialize(None)
+
+
+def test_mutable_validators():
+    validators = ["a"]
+    type = types.Int(validators=validators)
+    validators.append("b")
+    assert len(type.validators) == 1
