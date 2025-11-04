@@ -1,4 +1,5 @@
 """Test the basic functionality of the Accessor."""
+
 from halogen.schema import Accessor
 
 

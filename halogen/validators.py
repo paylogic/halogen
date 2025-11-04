@@ -1,4 +1,5 @@
 """Halogen basic type validators."""
+
 from abc import abstractmethod
 from typing import Iterable, Any
 
@@ -6,7 +7,6 @@ from halogen import exceptions
 
 
 class Validator(object):
-
     """Base validator."""
 
     @abstractmethod
@@ -20,10 +20,9 @@ class Validator(object):
 
 
 class LessThanEqual(Validator):
-
     """Less than or equal."""
 
-    value_err = u"{0} is bigger than {1}"
+    value_err = "{0} is bigger than {1}"
 
     def __init__(self, value, value_err=None):
         """Less than or equal validator constructor.
@@ -42,10 +41,9 @@ class LessThanEqual(Validator):
 
 
 class GreatThanEqual(Validator):
-
     """Greater than or equal."""
 
-    value_err = u"{0} is smaller than {1}"
+    value_err = "{0} is smaller than {1}"
 
     def __init__(self, value, value_err=None):
         """Greater than or equal validator constructor.
@@ -64,7 +62,6 @@ class GreatThanEqual(Validator):
 
 
 class Length(Validator):
-
     """Length validator that checks the length of a List-like type."""
 
     min_err = "Length is less than {0}"
@@ -112,7 +109,6 @@ class Length(Validator):
 
 
 class Range(object):
-
     """Range validator.
 
     Validator which succeeds if the value it is passed is greater or equal to ``min`` and less than or equal to
@@ -120,8 +116,8 @@ class Range(object):
     specified, or is specified as ``None``, no upper bound exists.
     """
 
-    min_err = u"{val} is less than minimum value {min}"
-    max_err = u"{val} is greater than maximum value {max}"
+    min_err = "{val} is less than minimum value {min}"
+    max_err = "{val} is greater than maximum value {max}"
 
     def __init__(self, min=None, max=None, min_err=None, max_err=None):
         """Range validator constructor.

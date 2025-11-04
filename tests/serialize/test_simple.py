@@ -23,7 +23,6 @@ def test_curies():
     ACME = halogen.Curie(name="acme", href="/test/123")
 
     class Schema(halogen.Schema):
-
         """A test schema."""
 
         warehouse = halogen.Link(curie=ACME)
@@ -37,7 +36,6 @@ def test_constant_href():
     """Test if serializing a constant attribute works correctly."""
 
     class Schema(halogen.Schema):
-
         """A test schema."""
 
         warehouse = halogen.Link("/test/123", deprecation="http://foo.bar")
@@ -95,7 +93,7 @@ def test_exclude_on_attribute():
 
         foo_2 = halogen.Attr(default=1, required=False, exclude=(None,))
 
-        foo_3 = halogen.Attr(attr=lambda _:1, required=False, exclude=(None,))
+        foo_3 = halogen.Attr(attr=lambda _: 1, required=False, exclude=(None,))
 
         foo_4 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=False, exclude=(None,))
 
@@ -107,15 +105,17 @@ def test_exclude_on_attribute():
 
         required_bar_3 = halogen.Attr(halogen.types.Nullable(halogen.types.Int()), required=True, exclude=(None,))
 
-    data = FooBar.serialize({
-        "foo_1": None,
-        "foo_2": None,
-        "foo_3": None,
-        "foo_4": None,
-        "required_bar_1": None,
-        "required_bar_2": None,
-        "required_bar_3": None
-    })
+    data = FooBar.serialize(
+        {
+            "foo_1": None,
+            "foo_2": None,
+            "foo_3": None,
+            "foo_4": None,
+            "required_bar_1": None,
+            "required_bar_2": None,
+            "required_bar_3": None,
+        }
+    )
     assert "foo_1" not in data
     assert data["foo_2"] == 1
     assert data["foo_3"] == 1
