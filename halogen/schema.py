@@ -124,7 +124,7 @@ class Attr(object):
         self.attr_type = attr_type or types.Type()
         self.attr = attr
         self.required = required
-        self.exclude = [] if exclude is None else exclude
+        self.exclude = [] if exclude is None else list(exclude)
 
         if "default" in kwargs:
             self.default = kwargs["default"]

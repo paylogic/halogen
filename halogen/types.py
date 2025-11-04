@@ -25,7 +25,7 @@ class Type(object):
             deserialized value. Validators raise :class:`halogen.exception.ValidationError` exceptions when
             value is not valid.
         """
-        self.validators = validators or []
+        self.validators = [] if validators is None else list(validators)
 
     def serialize(self, value, **kwargs):
         """Serialization of value."""

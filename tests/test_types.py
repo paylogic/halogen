@@ -306,3 +306,9 @@ def test_nullable_enum():
 
     with pytest.raises(ValueError):
         type_.serialize(None)
+
+def test_mutable_validators():
+    validators = ['a']
+    type = types.Int(validators=validators)
+    validators.append('b')
+    assert len(type.validators) == 1
