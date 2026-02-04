@@ -2,7 +2,7 @@
 
 import inspect
 from collections import OrderedDict, namedtuple
-from typing import Iterable, Optional, Union
+from typing import Iterable, Optional, Union, TypeVar, Generic, overload
 
 from cached_property import cached_property
 
@@ -59,7 +59,9 @@ class Accessor(object):
         if callable(self.getter):
             return self.getter(obj, **_get_context(self._getter_argspec, kwargs))
 
-        assert isinstance(self.getter, str), "Accessor must be a function or a dot-separated string."
+        assert isinstance(self.getter, str), (
+            "Accessor must be a function or a dot-separated string."
+        )
 
         if obj is None:
             return None
@@ -89,7 +91,9 @@ class Accessor(object):
         if callable(self.setter):
             return self.setter(obj, value)
 
-        assert isinstance(self.setter, str), "Accessor must be a function or a dot-separated string."
+        assert isinstance(self.setter, str), (
+            "Accessor must be a function or a dot-separated string."
+        )
 
         def _set(obj, attr, value):
             if isinstance(obj, dict):
@@ -106,15 +110,57 @@ class Accessor(object):
 
     def __repr__(self):
         """Accessor representation."""
-        return "<{0} getter='{1}', setter='{2}'>".format(self.__class__.__name__, self.getter, self.setter)
+        return "<{0} getter='{1}', setter='{2}'>".format(
+            self.__class__.__name__, self.getter, self.setter
+        )
 
 
-class Attr(object):
+T = TypeVar("T")
+
+
+class Attr(Generic[T]):
     """Schema attribute."""
 
     creation_counter = 0
 
-    def __init__(self, attr_type=None, attr=None, required: bool = True, exclude: Optional[Iterable] = None, **kwargs):
+    @overload
+    def __init__(
+        self,
+        attr_type: "types.Type[T]" = ...,
+        attr=None,
+        required: bool = True,
+        exclude: Optional[Iterable] = None,
+        **kwargs,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        attr_type: type["_Schema"] = ...,
+        attr=None,
+        required: bool = True,
+        exclude: Optional[Iterable] = None,
+        **kwargs,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        attr_type: object = ...,
+        attr=None,
+        required: bool = True,
+        exclude: Optional[Iterable] = None,
+        **kwargs,
+    ) -> None: ...
+
+    def __init__(
+        self,
+        attr_type=None,
+        attr=None,
+        required: bool = True,
+        exclude: Optional[Iterable] = None,
+        **kwargs,
+    ):
         """Attribute constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
@@ -131,6 +177,20 @@ class Attr(object):
 
         self.creation_counter = Attr.creation_counter
         Attr.creation_counter += 1
+
+    @overload
+    def __get__(self, obj: None, objtype: Optional[type] = None) -> "Attr[T]": ...
+
+    @overload
+    def __get__(self, obj: object, objtype: Optional[type] = None) -> "Attr[T]": ...
+
+    def __get__(self, obj: Optional[object], objtype: Optional[type] = None):
+        # Attr instances are removed from Schema classes at runtime, so this is a typing-only aid.
+        return self
+
+    def __set__(self, obj: object, value: T) -> None:
+        # Typing-only descriptor hook.
+        raise AttributeError("Attr descriptors are not set on instances.")
 
     @property
     def compartment(self):
@@ -184,8 +244,12 @@ class Attr(object):
                     raise
                 value = self._default()
 
-            value = self.attr_type.serialize(value, **_get_context(self._attr_type_serialize_argspec, kwargs))
-            value = self._default() if value is None and hasattr(self, "default") else value
+            value = self.attr_type.serialize(
+                value, **_get_context(self._attr_type_serialize_argspec, kwargs)
+            )
+            value = (
+                self._default() if value is None and hasattr(self, "default") else value
+            )
             if value in self.exclude:
                 raise ExcludedValueException()
             return value
@@ -282,7 +346,6 @@ class Link(Attr):
                            the target resource.
         """
         if not types.Type.is_type(attr_type):
-
             if attr_type is not None:
                 attr = BYPASS
 
@@ -342,7 +405,9 @@ class LinkList(Link):
         :param required: Is this list of links required to be present.
         :param curie: Link namespace prefix (e.g. "<prefix>:<name>") or Curie object.
         """
-        super(LinkList, self).__init__(attr_type=attr_type, attr=attr, required=required, curie=curie)
+        super(LinkList, self).__init__(
+            attr_type=attr_type, attr=attr, required=required, curie=curie
+        )
         self.attr_type = types.List(self.attr_type)
 
 
@@ -370,14 +435,22 @@ class Curie(object):
 class Embedded(Attr):
     """Embedded attribute of schema."""
 
-    def __init__(self, attr_type: Union["halogen.Schema", "halogen.types.List"], attr=None, curie=None, required=True):
+    def __init__(
+        self,
+        attr_type: Union["halogen.Schema", "halogen.types.List"],
+        attr=None,
+        curie=None,
+        required=True,
+    ):
         """Embedded constructor.
 
         :param attr_type: Type, Schema or constant that does the type conversion of the attribute.
         :param attr: Attribute name, dot-separated attribute path or an `Accessor` instance.
         :param curie: The curie used for this embedded attribute.
         """
-        super(Embedded, self).__init__(attr_type=attr_type, attr=attr, required=required)
+        super(Embedded, self).__init__(
+            attr_type=attr_type, attr=attr, required=required
+        )
         self.curie = curie
         self.validate()
 
@@ -407,7 +480,9 @@ class Embedded(Attr):
         # Validate self link
         class_attributes = attribute_type.__dict__.get("__attrs__")
         if class_attributes is not None and "self" not in class_attributes.keys():
-            raise InvalidSchemaDefinition("Invalid HAL standard definition, need `self` link")
+            raise InvalidSchemaDefinition(
+                "Invalid HAL standard definition, need `self` link"
+            )
 
 
 class _Schema(types.Type):
@@ -469,7 +544,9 @@ class _Schema(types.Type):
                 errors.append(e)
             except (KeyError, AttributeError):
                 if attr.required:
-                    errors.append(exceptions.ValidationError("Missing attribute.", attr.name))
+                    errors.append(
+                        exceptions.ValidationError("Missing attribute.", attr.name)
+                    )
 
         if errors:
             raise exceptions.ValidationError(errors)
@@ -489,7 +566,9 @@ class _SchemaType(type):
         cls.__class_attrs__ = OrderedDict()
         curies = set([])
 
-        attrs = [(key, value) for key, value in clsattrs.items() if isinstance(value, Attr)]
+        attrs = [
+            (key, value) for key, value in clsattrs.items() if isinstance(value, Attr)
+        ]
         attrs.sort(key=lambda attr: attr[1].creation_counter)
 
         # Collect the attributes and set their names.
@@ -508,7 +587,12 @@ class _SchemaType(type):
 
         if curies:
             link = LinkList(
-                Schema(href=Attr(), name=Attr(), templated=Attr(required=False), type=Attr(required=False)),
+                Schema(
+                    href=Attr(),
+                    name=Attr(),
+                    templated=Attr(required=False),
+                    type=Attr(required=False),
+                ),
                 attr=lambda value: list(curies),
                 required=False,
             )

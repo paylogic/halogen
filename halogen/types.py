@@ -4,7 +4,7 @@ import datetime
 import decimal
 import enum
 import typing
-from typing import Union, Optional, Any
+from typing import Union, Optional, Any, TypeVar, Generic, Protocol, TypedDict
 
 import dateutil.parser
 import isodate
@@ -16,7 +16,10 @@ if typing.TYPE_CHECKING:
     from .schema import _Schema
 
 
-class Type(object):
+T = TypeVar("T")
+
+
+class Type(Generic[T]):
     """Base class for creating types."""
 
     def __init__(self, validators=None, *args, **kwargs):
@@ -28,11 +31,11 @@ class Type(object):
         """
         self.validators = [] if validators is None else list(validators)
 
-    def serialize(self, value, **kwargs):
+    def serialize(self, value: T, **kwargs) -> Any:
         """Serialization of value."""
         return value
 
-    def deserialize(self, value, **kwargs):
+    def deserialize(self, value: Any, **kwargs) -> T:
         """Deserialization of value.
 
         :return: Deserialized value.
@@ -58,10 +61,16 @@ class Type(object):
         return isinstance(value, Type)
 
 
-class List(Type):
+class List(Type[list[T]]):
     """List type for Halogen schema attribute."""
 
-    def __init__(self, item_type=None, allow_scalar=False, *args, **kwargs):
+    def __init__(
+        self,
+        item_type: Optional["Type[T]"] = None,
+        allow_scalar: bool = False,
+        *args,
+        **kwargs,
+    ):
         """Create a new List.
 
         :param item_type: Item type or schema.
@@ -75,7 +84,9 @@ class List(Type):
         """Serialize every item of the list."""
         if value is None:
             raise ValueError("None passed, use Nullable type for nullable values")
-        return super().serialize([self.item_type.serialize(val, **kwargs) for val in value], **kwargs)
+        return super().serialize(
+            [self.item_type.serialize(val, **kwargs) for val in value], **kwargs
+        )
 
     def deserialize(self, value, **kwargs):
         """Deserialize every item of the list."""
@@ -102,7 +113,7 @@ class List(Type):
         return super().deserialize(result, **kwargs)
 
 
-class ISODateTime(Type):
+class ISODateTime(Type[datetime.datetime]):
     """ISO-8601 datetime schema type."""
 
     type = "datetime"
@@ -128,7 +139,7 @@ class ISODateTime(Type):
         return super().deserialize(value)
 
 
-class ISOUTCDateTime(Type):
+class ISOUTCDateTime(Type[datetime.datetime]):
     """ISO-8601 datetime schema type in UTC timezone."""
 
     type = "datetime"
@@ -169,7 +180,7 @@ class ISOUTCDate(ISOUTCDateTime):
     message = "'{val}' is not a valid ISO-8601 date"
 
 
-class String(Type):
+class String(Type[str]):
     """String schema type."""
 
     def serialize(self, value, **kwargs):
@@ -183,7 +194,7 @@ class String(Type):
         return super().deserialize(str(value), **kwargs)
 
 
-class Int(Type):
+class Int(Type[int]):
     """Int schema type."""
 
     def serialize(self, value, **kwargs):
@@ -201,7 +212,7 @@ class Int(Type):
         return super().deserialize(value, **kwargs)
 
 
-class Boolean(Type):
+class Boolean(Type[bool]):
     """Boolean schema type."""
 
     def serialize(self, value, **kwargs):
@@ -234,12 +245,31 @@ class Boolean(Type):
         return super().deserialize(value, **kwargs)
 
 
-class Amount(Type):
+class AmountSerialized(TypedDict):
+    amount: str
+    currency: str
+
+
+class AmountLike(Protocol):
+    currency: str
+    amount: decimal.Decimal
+
+    def as_quantized(self, *, digits: int) -> "AmountLike": ...
+
+    def as_tuple(self) -> tuple[str, decimal.Decimal]: ...
+
+
+AmountValueT = TypeVar("AmountValueT", bound=AmountLike)
+
+
+class Amount(Type[AmountValueT]):
     """Amount (money) schema type."""
 
     err_unknown_currency = "'{currency}' is not a valid currency."
 
-    def __init__(self, currencies, amount_class, **kwargs):
+    def __init__(
+        self, currencies: list[str], amount_class: type[AmountValueT], **kwargs
+    ):
         """Initialize new instance of Amount.
 
         :param currencies: list of all possible currency codes.
@@ -249,7 +279,9 @@ class Amount(Type):
         self.amount_class = amount_class
         super().__init__(**kwargs)
 
-    def amount_object_to_dict(self, amount) -> dict[str, str]:
+    def amount_object_to_dict(
+        self, amount: Union[AmountValueT, AmountSerialized]
+    ) -> AmountSerialized:
         """Return the dictionary representation of an Amount object.
 
         Amount object must have amount and currency properties and as_tuple method which will return (currency, amount)
@@ -271,7 +303,9 @@ class Amount(Type):
             "currency": str(currency),
         }
 
-    def serialize(self, value, **kwargs):
+    def serialize(
+        self, value: Union[AmountValueT, AmountSerialized], **kwargs
+    ) -> AmountSerialized:
         """Serialize amount.
 
         :param value: Amount value.
@@ -283,7 +317,9 @@ class Amount(Type):
 
         return super().serialize(self.amount_object_to_dict(value), **kwargs)
 
-    def deserialize(self, value, **kwargs):
+    def deserialize(
+        self, value: Union[str, AmountSerialized], **kwargs
+    ) -> AmountValueT:
         """Deserialize the amount.
 
         :param value: Amount in CURRENCYAMOUNT or {"currency": CURRENCY, "amount": AMOUNT} format. For example EUR35.50
@@ -301,7 +337,9 @@ class Amount(Type):
             amount = value[3:]
         elif isinstance(value, dict):
             if set(value.keys()) != set(("currency", "amount")):
-                raise ValueError("Amount object has to have currency and amount fields.")
+                raise ValueError(
+                    "Amount object has to have currency and amount fields."
+                )
             amount = value["amount"]
             currency = value["currency"]
         else:
@@ -313,28 +351,32 @@ class Amount(Type):
         try:
             amount = decimal.Decimal(amount).normalize()
         except decimal.InvalidOperation:
-            raise ValueError("'{amount}' cannot be parsed to decimal.".format(amount=amount))
+            raise ValueError(
+                "'{amount}' cannot be parsed to decimal.".format(amount=amount)
+            )
 
         if amount.as_tuple().exponent < -2:
-            raise ValueError("'{amount}' has more than 2 decimal places.".format(amount=amount))
+            raise ValueError(
+                "'{amount}' has more than 2 decimal places.".format(amount=amount)
+            )
 
         value = self.amount_class(currency=currency, amount=amount)
         return super().deserialize(value)
 
 
-class Nullable(Type):
+class Nullable(Type[Optional[T]]):
     """Nullable type."""
 
-    def __init__(self, nested_type: Union[type[Type], Type, "_Schema"], *args, **kwargs):
+    def __init__(self, nested_type: Union["Type[T]", type["_Schema"]], *args, **kwargs):
         self.nested_type = nested_type
         super().__init__(*args, **kwargs)
 
-    def serialize(self, value: Optional[Any], **kwargs):
+    def serialize(self, value: Optional[Any], **kwargs) -> Optional[T]:
         if value is None:
             return None
         return self.nested_type.serialize(value, **kwargs)
 
-    def deserialize(self, value: Optional[Any], **kwargs):
+    def deserialize(self, value: Optional[Any], **kwargs) -> Optional[T]:
         if value is None:
             return None
         return self.nested_type.deserialize(value, **kwargs)
