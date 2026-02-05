@@ -2,7 +2,18 @@
 
 import inspect
 from collections import OrderedDict, namedtuple
-from typing import Iterable, Optional, Union, TypeVar, Generic, overload
+from typing import (
+    Any,
+    Iterable,
+    Optional,
+    Union,
+    TypeVar,
+    Generic,
+    overload,
+    TYPE_CHECKING,
+    TypedDict,
+    List as TypingList,
+)
 
 from cached_property import cached_property
 
@@ -604,6 +615,108 @@ class _SchemaType(type):
         for base in reversed(cls.__mro__):
             cls.__attrs__.update(getattr(base, "__class_attrs__", OrderedDict()))
 
+        cls.__output_type__ = _build_schema_output_type(cls)
 
-Schema = _SchemaType("Schema", (_Schema,), {"__doc__": _Schema.__doc__})
-"""Schema is the basic class used for setting up schemas."""
+
+def _build_schema_output_type(schema_cls):
+    fields = {}
+    optional_fields = set()
+    compartment_fields = {}
+
+    for attr in schema_cls.__attrs__.values():
+        target = fields
+        if attr.compartment is not None:
+            target = compartment_fields.setdefault(attr.compartment, {})
+
+        key = attr.key
+        target[key] = _python_type_for_attr_type(attr.attr_type)
+        if not attr.required:
+            optional_fields.add((attr.compartment, key))
+
+    for compartment, comp_fields in compartment_fields.items():
+        fields[compartment] = _build_typed_dict_for_fields(
+            f"{schema_cls.__name__}{compartment.title().replace('_', '')}",
+            comp_fields,
+            {k for (c, k) in optional_fields if c == compartment},
+        )
+
+    return _build_typed_dict_for_fields(
+        f"{schema_cls.__name__}Serialized",
+        fields,
+        {k for (c, k) in optional_fields if c is None},
+    )
+
+
+def _build_typed_dict_for_fields(name, fields, optional_keys):
+    try:
+        from typing import NotRequired
+    except ImportError:
+        NotRequired = None
+
+    if NotRequired is not None and optional_keys:
+        annotations = {}
+        for key, value in fields.items():
+            if key in optional_keys:
+                annotations[key] = NotRequired[value]
+            else:
+                annotations[key] = value
+        return TypedDict(name, annotations, total=True)
+
+    total = not optional_keys
+    return TypedDict(name, dict(fields), total=total)
+
+
+def _python_type_for_attr_type(attr_type):
+    if isinstance(attr_type, halogen.schema._SchemaType):
+        return getattr(attr_type, "__output_type__", dict)
+
+    if isinstance(attr_type, halogen.types.List):
+        return TypingList[_python_type_for_attr_type(attr_type.item_type)]
+
+    if isinstance(attr_type, halogen.types.Nullable):
+        return Optional[_python_type_for_attr_type(attr_type.nested_type)]
+
+    if isinstance(attr_type, halogen.types.String):
+        return str
+
+    if isinstance(attr_type, halogen.types.Int):
+        return int
+
+    if isinstance(attr_type, halogen.types.Boolean):
+        return bool
+
+    if isinstance(
+        attr_type,
+        (
+            halogen.types.ISODateTime,
+            halogen.types.ISOUTCDateTime,
+            halogen.types.ISOUTCDate,
+        ),
+    ):
+        return str
+
+    if isinstance(attr_type, halogen.types.Amount):
+        return halogen.types.AmountSerialized
+
+    if isinstance(attr_type, halogen.types.Enum):
+        return str if not attr_type.use_values else object
+
+    if isinstance(attr_type, halogen.types.Type):
+        return Any
+
+    return type(attr_type)
+
+
+if TYPE_CHECKING:
+
+    class Schema(_Schema, metaclass=_SchemaType):
+        """Typing-only schema base class."""
+
+        @classmethod
+        def serialize(cls, value, **kwargs): ...
+
+        @classmethod
+        def deserialize(cls, value, output=None, **kwargs): ...
+else:
+    Schema = _SchemaType("Schema", (_Schema,), {"__doc__": _Schema.__doc__})
+    """Schema is the basic class used for setting up schemas."""
