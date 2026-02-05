@@ -8,7 +8,3 @@ class PaginationResponse(Schema):
     total = Attr(Int())
     test = Attr(Nullable(Int()))
     x = Attr(List(Int()))
-
-
-PaginationResponse.total
-PaginationResponse.x
