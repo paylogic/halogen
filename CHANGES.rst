@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.2.0
+-----
+
+* Make VNDError serializable
+
+
 2.1.1
 -----
 
