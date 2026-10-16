@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+import json
+
 import halogen
 
 
@@ -20,6 +22,14 @@ class Error(Exception):
             self.path = path
         if errors is not None:
             self.errors = errors
+
+    def to_dict(self):
+        """Serialize to a dict compatible with application/vnd.error+json."""
+        return VNDError.serialize(self)
+
+    def to_json(self, **kwargs):
+        """Serialize to a JSON string."""
+        return json.dumps(self.to_dict(), **kwargs)
 
     @classmethod
     def from_validation_exception(cls, exception, **kwargs):

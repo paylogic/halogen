@@ -2,6 +2,7 @@
 """Test vnd.error."""
 
 
+import json
 import uuid
 
 import halogen
@@ -61,3 +62,48 @@ def test_validation():
     ]
 
     assert data["errors"] == expected_errors
+
+
+def test_to_dict():
+    error = Error(message="Something went wrong", path="/foo")
+    result = error.to_dict()
+    assert result == {"message": "Something went wrong", "path": "/foo"}
+
+
+def test_to_dict_with_nested_errors():
+    error = Error(
+        message="Validation error.",
+        errors=[
+            Error(message="Missing attribute.", path="/title"),
+            Error(message="Not an integer", path="/year"),
+        ],
+    )
+    result = error.to_dict()
+    assert result["message"] == "Validation error."
+    assert result["errors"] == [
+        {"message": "Missing attribute.", "path": "/title"},
+        {"message": "Not an integer", "path": "/year"},
+    ]
+
+
+def test_to_json():
+    error = Error(message="Something went wrong", path="/foo")
+    result = error.to_json()
+    assert json.loads(result) == {"message": "Something went wrong", "path": "/foo"}
+
+
+def test_to_json_roundtrip():
+    try:
+        BookSchema.deserialize(
+            dict(
+                year="abc",
+                authors=[dict(name="John Smith"), dict()],
+                publisher=dict(address="Chasey Lane 42"),
+            ),
+        )
+    except halogen.exceptions.ValidationError as e:
+        error = Error.from_validation_exception(e)
+
+    result = json.loads(error.to_json())
+    assert result["message"] == "Validation error."
+    assert len(result["errors"]) == 4

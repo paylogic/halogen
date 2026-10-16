@@ -1,11 +1,12 @@
 # create virtual environment
-.env:
-	virtualenv .env
+.venv:
+	python3 -m venv .venv
 
 # install all needed for development
-develop: .env
-	.env/bin/pip install -e . -r requirements-testing.txt tox
+develop: .venv
+	.venv/bin/pip install --upgrade pip
+	.venv/bin/pip install -e . -r requirements-testing.txt tox
 
-# clean the development envrironment
+# clean the development environment
 clean:
-	-rm -rf .env
+	-rm -rf .venv
